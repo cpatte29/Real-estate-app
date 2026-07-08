@@ -1,12 +1,15 @@
 """
 Shared in-memory state for the API layer.
 
-Two stores:
-  _run_store   — scanner run records (owned by scanner.py)
-  _lead_store  — CRM lead records, keyed by lead_id (str of property UUID)
+Three stores:
+  _run_store        — scanner run records (owned by scanner.py)
+  _lead_store       — CRM lead records, keyed by lead_id (str of property UUID)
+  _comp_repository  — the process-wide CompRepository used by comp ingestion
+                       endpoints (admin_comps.py) and, once wired into the
+                       pipeline, PostgresCompSource
 
-Both are module-level dicts. Tests that need isolation should call
-clear_stores() in a fixture.
+Both dict-based stores and the repository reference are module-level.
+Tests that need isolation should call clear_stores() in a fixture.
 """
 from __future__ import annotations
 
@@ -14,6 +17,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.models.lead_review import LeadRecord, LeadReview, LeadReviewStatus
+from app.scanner.comps.repository import CompRepository, InMemoryCompRepository
 
 # ── Stores ────────────────────────────────────────────────────────────────────
 
@@ -22,6 +26,21 @@ _run_store: dict[str, dict] = {}
 
 # CRM lead records — populated when scanner completes
 _lead_store: dict[str, LeadRecord] = {}
+
+# Comp pool repository — defaults to in-memory. Swap via set_comp_repository()
+# once a real Postgres connection is wired up (out of scope for this endpoint).
+_comp_repository: CompRepository = InMemoryCompRepository()
+
+
+# ── Comp repository helpers ───────────────────────────────────────────────────
+
+def get_comp_repository() -> CompRepository:
+    return _comp_repository
+
+
+def set_comp_repository(repository: CompRepository) -> None:
+    global _comp_repository
+    _comp_repository = repository
 
 
 # ── Run store helpers ─────────────────────────────────────────────────────────
@@ -101,6 +120,7 @@ def update_lead_review(
 
 
 def clear_stores() -> None:
-    """Reset both stores. Intended for use in tests only."""
+    """Reset all stores. Intended for use in tests only."""
     _run_store.clear()
     _lead_store.clear()
+    set_comp_repository(InMemoryCompRepository())

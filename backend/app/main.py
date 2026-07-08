@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.scanner import router as scanner_router
 from app.api.leads import router as leads_router
+from app.api.admin_comps import router as admin_comps_router
 
 
 def create_app() -> FastAPI:
@@ -22,6 +23,7 @@ def create_app() -> FastAPI:
 
     app.include_router(scanner_router)
     app.include_router(leads_router)
+    app.include_router(admin_comps_router)
 
     @app.get("/health")
     async def health():
