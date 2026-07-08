@@ -22,12 +22,11 @@ from pydantic import BaseModel
 from app.scanner.config import config
 from app.scanner.pipeline import LeadScannerPipeline
 from app.reports.generator import ReportGenerator
+import app.api.state as _state
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/scanner", tags=["scanner"])
 
-# In-memory store for demo (replace with DB in production)
-_run_store: dict[str, dict] = {}
 _last_state = None
 
 
@@ -66,7 +65,7 @@ class TriggerRunResponse(BaseModel):
 def _execute_scan(run_id: str, run_date: date, cfg_overrides: dict):
     global _last_state
     logger.info("Background scan starting | run_id=%s", run_id)
-    _run_store[run_id]["status"] = "running"
+    _state.update_run(run_id, {"status": "running"})
 
     try:
         from app.scanner.config import ScannerConfig
@@ -80,7 +79,11 @@ def _execute_scan(run_id: str, run_date: date, cfg_overrides: dict):
         gen = ReportGenerator()
         paths = gen.generate(state)
 
-        _run_store[run_id].update({
+        run_date_str = run_date.isoformat() if hasattr(run_date, "isoformat") else str(run_date)
+        added = _state.register_leads(run_id, run_date_str, state.accepted_leads)
+        logger.info("Registered %d new CRM leads | run_id=%s", added, run_id)
+
+        _state.update_run(run_id, {
             "status": "completed",
             "state": state,
             "report_paths": paths,
@@ -95,8 +98,7 @@ def _execute_scan(run_id: str, run_date: date, cfg_overrides: dict):
 
     except Exception as exc:
         logger.exception("Scan failed | run_id=%s", run_id)
-        _run_store[run_id]["status"] = "failed"
-        _run_store[run_id]["error"] = str(exc)
+        _state.update_run(run_id, {"status": "failed", "error": str(exc)})
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -119,7 +121,7 @@ async def trigger_scan(
     if req.max_candidates_checked:
         overrides["max_candidates_checked"] = req.max_candidates_checked
 
-    _run_store[run_id] = {
+    _state.upsert_run(run_id, {
         "run_id": run_id,
         "run_date": run_date.isoformat(),
         "status": "queued",
@@ -128,7 +130,7 @@ async def trigger_scan(
         "leads_rejected": 0,
         "iterations": 0,
         "stop_reason": None,
-    }
+    })
 
     if not req.dry_run:
         background_tasks.add_task(_execute_scan, run_id, run_date, overrides)
@@ -146,7 +148,7 @@ async def list_runs(
     offset: int = 0,
 ):
     """List scanner runs, newest first."""
-    runs = list(reversed(list(_run_store.values())))
+    runs = list(reversed(list(_state.get_run_store().values())))
     return {
         "total": len(runs),
         "runs": [
@@ -159,7 +161,7 @@ async def list_runs(
 @router.get("/runs/{run_id}")
 async def get_run(run_id: str):
     """Get detailed status for a specific run."""
-    run = _run_store.get(run_id)
+    run = _state.get_run_store().get(run_id)
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
 
@@ -172,7 +174,7 @@ async def get_run_report(run_id: str):
     """Return the HTML report for a completed run."""
     from fastapi.responses import HTMLResponse
 
-    run = _run_store.get(run_id)
+    run = _state.get_run_store().get(run_id)
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
     if run["status"] != "completed":
@@ -196,7 +198,7 @@ async def list_leads(
 ):
     """List accepted leads across all completed runs, sorted by score."""
     all_leads = []
-    for run in _run_store.values():
+    for run in _state.get_run_store().values():
         run_state = run.get("state")
         if not run_state:
             continue
@@ -221,13 +223,10 @@ async def list_leads(
 @router.get("/state")
 async def get_scanner_state():
     """Return current scanner state across all runs."""
-    total_accepted = sum(
-        r.get("leads_accepted", 0) for r in _run_store.values()
-    )
-    total_checked = sum(
-        r.get("candidates_checked", 0) for r in _run_store.values()
-    )
-    completed_runs = [r for r in _run_store.values() if r["status"] == "completed"]
+    run_store = _state.get_run_store()
+    total_accepted = sum(r.get("leads_accepted", 0) for r in run_store.values())
+    total_checked = sum(r.get("candidates_checked", 0) for r in run_store.values())
+    completed_runs = [r for r in run_store.values() if r["status"] == "completed"]
 
     return {
         "total_runs": len(_run_store),
