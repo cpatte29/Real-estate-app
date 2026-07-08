@@ -1,0 +1,1438 @@
+{
+  "report_type": "daily_lead_scanner",
+  "run_id": "09bb235a-3169-4f09-b42c-4583bb324f17",
+  "run_date": "2026-07-08",
+  "generated_at": "2026-07-08T13:32:22.873313Z",
+  "stop_condition": "qualified_limit",
+  "summary": {
+    "iterations": 7,
+    "candidates_found": 350,
+    "candidates_checked": 302,
+    "leads_accepted": 25,
+    "leads_rejected": 277,
+    "acceptance_rate_pct": 8.3
+  },
+  "rejection_breakdown": {
+    "low_arv_confidence": 141,
+    "insufficient_profit": 31,
+    "missing_address": 18,
+    "insufficient_comps": 83,
+    "failed_mao_rule": 4
+  },
+  "scanner_config": {
+    "max_qualified_leads": 25,
+    "max_candidates_checked": 500,
+    "max_iterations": 8,
+    "min_comp_count": 3,
+    "min_arv_confidence_score": 70.0,
+    "min_estimated_profit": 20000.0,
+    "mao_arv_multiplier": 0.7
+  },
+  "leads": [
+    {
+      "property_id": "97259b0b-6caf-4575-95a9-eff16224a663",
+      "address": {
+        "street": "2110 Martin Luther King Way",
+        "city": "Kansas City",
+        "state": "MO",
+        "zip": "64130",
+        "county": "Kansas City County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 1.5,
+        "sqft": 2713,
+        "year_built": 1970
+      },
+      "distress": {
+        "types": [
+          "pre_foreclosure",
+          "tax_lien"
+        ],
+        "score": 95
+      },
+      "arv": {
+        "value": 430677.34,
+        "confidence": "high",
+        "confidence_score": 77.1,
+        "comp_count": 8,
+        "price_per_sqft_avg": 153.02
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 83700.0,
+        "cost_per_sqft": 30.85,
+        "regional_multiplier": 0.91
+      },
+      "deal": {
+        "list_price": 75024.54,
+        "max_allowable_offer": 217774.14,
+        "estimated_profit": 237773.45,
+        "roi_pct": 146.09,
+        "cash_invested": 162756.48,
+        "equity_spread": -142749.6,
+        "holding_months": 6,
+        "total_holding_cost": 2531.45
+      },
+      "score": {
+        "total": 94.67,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.42,
+          "distress": 14.25,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "8b7038ea-d98a-440a-9398-0fea7b877a75",
+      "address": {
+        "street": "8452 Elm Ln",
+        "city": "Atlanta",
+        "state": "GA",
+        "zip": "30310",
+        "county": "Atlanta County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.0,
+        "sqft": 1509,
+        "year_built": 1956
+      },
+      "distress": {
+        "types": [
+          "auction"
+        ],
+        "score": 73
+      },
+      "arv": {
+        "value": 270404.29,
+        "confidence": "high",
+        "confidence_score": 79.5,
+        "comp_count": 6,
+        "price_per_sqft_avg": 189.9
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 51000.0,
+        "cost_per_sqft": 33.8,
+        "regional_multiplier": 1.0
+      },
+      "deal": {
+        "list_price": 72453.0,
+        "max_allowable_offer": 138283.0,
+        "estimated_profit": 124035.51,
+        "roi_pct": 97.33,
+        "cash_invested": 127440.48,
+        "equity_spread": -65830.0,
+        "holding_months": 6,
+        "total_holding_cost": 2538.42
+      },
+      "score": {
+        "total": 91.85,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.9,
+          "distress": 10.95,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "5820013d-5842-4924-a48b-2123080d93ee",
+      "address": {
+        "street": "5677 Oak Dr",
+        "city": "Kansas City",
+        "state": "MO",
+        "zip": "64130",
+        "county": "Kansas City County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 2,
+        "bathrooms": 2.0,
+        "sqft": 2493,
+        "year_built": 1952
+      },
+      "distress": {
+        "types": [
+          "auction"
+        ],
+        "score": 77
+      },
+      "arv": {
+        "value": 362572.28,
+        "confidence": "medium",
+        "confidence_score": 73.7,
+        "comp_count": 6,
+        "price_per_sqft_avg": 142.32
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 76800.0,
+        "cost_per_sqft": 30.81,
+        "regional_multiplier": 0.91
+      },
+      "deal": {
+        "list_price": 68879.0,
+        "max_allowable_offer": 177000.6,
+        "estimated_profit": 187593.54,
+        "roi_pct": 125.4,
+        "cash_invested": 149598.68,
+        "equity_spread": -108121.6,
+        "holding_months": 6,
+        "total_holding_cost": 2542.1
+      },
+      "score": {
+        "total": 91.29,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 14.74,
+          "distress": 11.55,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "f9cf7bbe-ce82-4745-96df-0e2d8d5f70ed",
+      "address": {
+        "street": "6598 Pine Ct",
+        "city": "Birmingham",
+        "state": "AL",
+        "zip": "35204",
+        "county": "Birmingham County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 2,
+        "bathrooms": 2.0,
+        "sqft": 2394,
+        "year_built": 1942
+      },
+      "distress": {
+        "types": [
+          "bankruptcy"
+        ],
+        "score": 70
+      },
+      "arv": {
+        "value": 295181.53,
+        "confidence": "high",
+        "confidence_score": 76.5,
+        "comp_count": 6,
+        "price_per_sqft_avg": 118.81
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 71200.0,
+        "cost_per_sqft": 29.74,
+        "regional_multiplier": 0.88
+      },
+      "deal": {
+        "list_price": 90582.87,
+        "max_allowable_offer": 135427.07,
+        "estimated_profit": 108283.14,
+        "roi_pct": 65.14,
+        "cash_invested": 166235.68,
+        "equity_spread": -44844.2,
+        "holding_months": 6,
+        "total_holding_cost": 2641.15
+      },
+      "score": {
+        "total": 88.88,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.3,
+          "distress": 10.5,
+          "equity_spread": 8.08
+        }
+      }
+    },
+    {
+      "property_id": "289cbfbe-8d34-4e19-afdc-b555bd5d72e0",
+      "address": {
+        "street": "8889 Elm Blvd",
+        "city": "Atlanta",
+        "state": "GA",
+        "zip": "30310",
+        "county": "Atlanta County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.5,
+        "sqft": 1802,
+        "year_built": 1957
+      },
+      "distress": {
+        "types": [
+          "tax_lien"
+        ],
+        "score": 55
+      },
+      "arv": {
+        "value": 299332.36,
+        "confidence": "high",
+        "confidence_score": 77.9,
+        "comp_count": 6,
+        "price_per_sqft_avg": 164.63
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 61000.0,
+        "cost_per_sqft": 33.85,
+        "regional_multiplier": 1.0
+      },
+      "deal": {
+        "list_price": 71039.74,
+        "max_allowable_offer": 148532.65,
+        "estimated_profit": 142377.04,
+        "roi_pct": 104.69,
+        "cash_invested": 136002.06,
+        "equity_spread": -77492.91,
+        "holding_months": 6,
+        "total_holding_cost": 2541.52
+      },
+      "score": {
+        "total": 88.83,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.58,
+          "distress": 8.25,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "484f08a3-4e8b-44c4-aba9-1152f06397c7",
+      "address": {
+        "street": "4457 Oak St",
+        "city": "Indianapolis",
+        "state": "IN",
+        "zip": "46201",
+        "county": "Indianapolis County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 1.0,
+        "sqft": 1865,
+        "year_built": 1982
+      },
+      "distress": {
+        "types": [
+          "auction"
+        ],
+        "score": 81
+      },
+      "arv": {
+        "value": 253152.58,
+        "confidence": "medium",
+        "confidence_score": 74.7,
+        "comp_count": 7,
+        "price_per_sqft_avg": 141.87
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 58700.0,
+        "cost_per_sqft": 31.47,
+        "regional_multiplier": 0.93
+      },
+      "deal": {
+        "list_price": 89592.58,
+        "max_allowable_offer": 118506.81,
+        "estimated_profit": 82750.91,
+        "roi_pct": 54.2,
+        "cash_invested": 152680.99,
+        "equity_spread": -28914.23,
+        "holding_months": 6,
+        "total_holding_cost": 2596.56
+      },
+      "score": {
+        "total": 88.66,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 14.94,
+          "distress": 12.15,
+          "equity_spread": 6.57
+        }
+      }
+    },
+    {
+      "property_id": "d8151669-90dc-4b34-8d34-3f3d20b59a63",
+      "address": {
+        "street": "2323 Highland Ave",
+        "city": "Birmingham",
+        "state": "AL",
+        "zip": "35204",
+        "county": "Birmingham County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.5,
+        "sqft": 2180,
+        "year_built": 2002
+      },
+      "distress": {
+        "types": [
+          "probate"
+        ],
+        "score": 52
+      },
+      "arv": {
+        "value": 280799.14,
+        "confidence": "high",
+        "confidence_score": 76.6,
+        "comp_count": 6,
+        "price_per_sqft_avg": 124.65
+      },
+      "rehab": {
+        "level": "cosmetic",
+        "total_cost": 19600.0,
+        "cost_per_sqft": 8.99,
+        "regional_multiplier": 0.88
+      },
+      "deal": {
+        "list_price": 89077.43,
+        "max_allowable_offer": 176959.4,
+        "estimated_profit": 148000.74,
+        "roi_pct": 130.81,
+        "cash_invested": 113142.46,
+        "equity_spread": -87881.97,
+        "holding_months": 6,
+        "total_holding_cost": 2683.49
+      },
+      "score": {
+        "total": 88.12,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.32,
+          "distress": 7.8,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "07f84acb-63f4-46a3-a54b-87221f0ae0ed",
+      "address": {
+        "street": "5834 Elm Ave",
+        "city": "Indianapolis",
+        "state": "IN",
+        "zip": "46201",
+        "county": "Indianapolis County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "sqft": 2386,
+        "year_built": 1991
+      },
+      "distress": {
+        "types": [
+          "probate"
+        ],
+        "score": 46
+      },
+      "arv": {
+        "value": 344311.71,
+        "confidence": "high",
+        "confidence_score": 78.7,
+        "comp_count": 7,
+        "price_per_sqft_avg": 143.63
+      },
+      "rehab": {
+        "level": "cosmetic",
+        "total_cost": 22700.0,
+        "cost_per_sqft": 9.51,
+        "regional_multiplier": 0.93
+      },
+      "deal": {
+        "list_price": 78844.99,
+        "max_allowable_offer": 218318.2,
+        "estimated_profit": 214552.96,
+        "roi_pct": 203.07,
+        "cash_invested": 105656.93,
+        "equity_spread": -139473.21,
+        "holding_months": 6,
+        "total_holding_cost": 2535.05
+      },
+      "score": {
+        "total": 87.64,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.74,
+          "distress": 6.9,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "7ec707ae-c0ba-4ea7-8f86-76ee33cb973e",
+      "address": {
+        "street": "6056 Elm St",
+        "city": "Indianapolis",
+        "state": "IN",
+        "zip": "46201",
+        "county": "Indianapolis County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 2.0,
+        "sqft": 2026,
+        "year_built": 1969
+      },
+      "distress": {
+        "types": [
+          "divorce"
+        ],
+        "score": 37
+      },
+      "arv": {
+        "value": 309191.7,
+        "confidence": "high",
+        "confidence_score": 78.5,
+        "comp_count": 7,
+        "price_per_sqft_avg": 150.89
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 64000.0,
+        "cost_per_sqft": 31.59,
+        "regional_multiplier": 0.93
+      },
+      "deal": {
+        "list_price": 78122.61,
+        "max_allowable_offer": 152434.19,
+        "estimated_profit": 141281.97,
+        "roi_pct": 96.59,
+        "cash_invested": 146266.31,
+        "equity_spread": -74311.58,
+        "holding_months": 6,
+        "total_holding_cost": 2581.25
+      },
+      "score": {
+        "total": 86.25,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.7,
+          "distress": 5.55,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "cbe460e1-f270-4e6a-b543-d9278706ff68",
+      "address": {
+        "street": "2105 Birch St",
+        "city": "Atlanta",
+        "state": "GA",
+        "zip": "30310",
+        "county": "Atlanta County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 2,
+        "bathrooms": 2.0,
+        "sqft": 1737,
+        "year_built": 1945
+      },
+      "distress": {
+        "types": [
+          "divorce"
+        ],
+        "score": 33
+      },
+      "arv": {
+        "value": 327022.23,
+        "confidence": "high",
+        "confidence_score": 79.5,
+        "comp_count": 7,
+        "price_per_sqft_avg": 182.96
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 58900.0,
+        "cost_per_sqft": 33.91,
+        "regional_multiplier": 1.0
+      },
+      "deal": {
+        "list_price": 90093.78,
+        "max_allowable_offer": 170015.56,
+        "estimated_profit": 150691.55,
+        "roi_pct": 98.21,
+        "cash_invested": 153439.13,
+        "equity_spread": -79921.78,
+        "holding_months": 6,
+        "total_holding_cost": 2643.47
+      },
+      "score": {
+        "total": 85.85,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.9,
+          "distress": 4.95,
+          "equity_spread": 10.0
+        }
+      }
+    },
+    {
+      "property_id": "6cf324b7-cce6-421c-933a-b4e51b5b017c",
+      "address": {
+        "street": "9554 Lake Pl",
+        "city": "Memphis",
+        "state": "TN",
+        "zip": "38109",
+        "county": "Memphis County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 1.5,
+        "sqft": 2418,
+        "year_built": 1983
+      },
+      "distress": {
+        "types": [
+          "probate"
+        ],
+        "score": 48
+      },
+      "arv": {
+        "value": 304970.62,
+        "confidence": "high",
+        "confidence_score": 77.1,
+        "comp_count": 8,
+        "price_per_sqft_avg": 123.05
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 77900.0,
+        "cost_per_sqft": 32.22,
+        "regional_multiplier": 0.95
+      },
+      "deal": {
+        "list_price": 100352.1,
+        "max_allowable_offer": 135579.43,
+        "estimated_profit": 100690.05,
+        "roi_pct": 55.04,
+        "cash_invested": 182932.63,
+        "equity_spread": -35227.33,
+        "holding_months": 6,
+        "total_holding_cost": 2673.48
+      },
+      "score": {
+        "total": 84.24,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 15.42,
+          "distress": 7.2,
+          "equity_spread": 6.62
+        }
+      }
+    },
+    {
+      "property_id": "37219e9d-2fbb-484f-9cbe-f330abb588e5",
+      "address": {
+        "street": "2844 Martin Luther King Dr",
+        "city": "Jacksonville",
+        "state": "FL",
+        "zip": "32209",
+        "county": "Jacksonville County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 2,
+        "bathrooms": 2.0,
+        "sqft": 1486,
+        "year_built": 1974
+      },
+      "distress": {
+        "types": [
+          "pre_foreclosure",
+          "tax_lien"
+        ],
+        "score": 78
+      },
+      "arv": {
+        "value": 244535.1,
+        "confidence": "high",
+        "confidence_score": 76.2,
+        "comp_count": 7,
+        "price_per_sqft_avg": 157.49
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 55300.0,
+        "cost_per_sqft": 37.21,
+        "regional_multiplier": 1.1
+      },
+      "deal": {
+        "list_price": 100976.41,
+        "max_allowable_offer": 115874.57,
+        "estimated_profit": 66481.51,
+        "roi_pct": 41.31,
+        "cash_invested": 160936.13,
+        "equity_spread": -14898.16,
+        "holding_months": 6,
+        "total_holding_cost": 2640.2
+      },
+      "score": {
+        "total": 83.56,
+        "breakdown": {
+          "profit_margin": 27.19,
+          "roi": 25.0,
+          "arv_confidence": 15.24,
+          "distress": 11.7,
+          "equity_spread": 4.44
+        }
+      }
+    },
+    {
+      "property_id": "44d70a05-fa28-4f08-b864-2793e7a06ba9",
+      "address": {
+        "street": "2882 Peachtree Ct",
+        "city": "Birmingham",
+        "state": "AL",
+        "zip": "35204",
+        "county": "Birmingham County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 1.0,
+        "sqft": 2781,
+        "year_built": 2004
+      },
+      "distress": {
+        "types": [
+          "divorce"
+        ],
+        "score": 42
+      },
+      "arv": {
+        "value": 323951.94,
+        "confidence": "medium",
+        "confidence_score": 74.1,
+        "comp_count": 6,
+        "price_per_sqft_avg": 115.52
+      },
+      "rehab": {
+        "level": "cosmetic",
+        "total_cost": 24900.0,
+        "cost_per_sqft": 8.95,
+        "regional_multiplier": 0.88
+      },
+      "deal": {
+        "list_price": 159382.27,
+        "max_allowable_offer": 201866.36,
+        "estimated_profit": 110853.83,
+        "roi_pct": 58.21,
+        "cash_invested": 190421.48,
+        "equity_spread": -42484.09,
+        "holding_months": 6,
+        "total_holding_cost": 2951.56
+      },
+      "score": {
+        "total": 83.37,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 14.82,
+          "distress": 6.3,
+          "equity_spread": 7.25
+        }
+      }
+    },
+    {
+      "property_id": "33d5fcb9-e04d-467f-ba25-619375f7c252",
+      "address": {
+        "street": "559 Martin Luther King St",
+        "city": "Atlanta",
+        "state": "GA",
+        "zip": "30310",
+        "county": "Atlanta County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 1.0,
+        "sqft": 2035,
+        "year_built": 1969
+      },
+      "distress": {
+        "types": [
+          "auction"
+        ],
+        "score": 87
+      },
+      "arv": {
+        "value": 369096.43,
+        "confidence": "medium",
+        "confidence_score": 75.0,
+        "comp_count": 6,
+        "price_per_sqft_avg": 180.03
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 68900.0,
+        "cost_per_sqft": 33.86,
+        "regional_multiplier": 1.0
+      },
+      "deal": {
+        "list_price": 171408.61,
+        "max_allowable_offer": 189467.5,
+        "estimated_profit": 96420.81,
+        "roi_pct": 39.06,
+        "cash_invested": 246838.87,
+        "equity_spread": -18058.89,
+        "holding_months": 6,
+        "total_holding_cost": 3102.09
+      },
+      "score": {
+        "total": 82.9,
+        "breakdown": {
+          "profit_margin": 26.12,
+          "roi": 24.77,
+          "arv_confidence": 15.0,
+          "distress": 13.05,
+          "equity_spread": 3.96
+        }
+      }
+    },
+    {
+      "property_id": "b330de88-963a-432b-89fe-f456c063c933",
+      "address": {
+        "street": "7502 Elm Blvd",
+        "city": "Indianapolis",
+        "state": "IN",
+        "zip": "46201",
+        "county": "Indianapolis County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.5,
+        "sqft": 2495,
+        "year_built": 1998
+      },
+      "distress": {
+        "types": [
+          "code_violation"
+        ],
+        "score": 41
+      },
+      "arv": {
+        "value": 315898.47,
+        "confidence": "high",
+        "confidence_score": 78.5,
+        "comp_count": 6,
+        "price_per_sqft_avg": 129.89
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 78400.0,
+        "cost_per_sqft": 31.42,
+        "regional_multiplier": 0.93
+      },
+      "deal": {
+        "list_price": 119217.06,
+        "max_allowable_offer": 142728.93,
+        "estimated_profit": 90961.93,
+        "roi_pct": 44.85,
+        "cash_invested": 202823.65,
+        "equity_spread": -23511.87,
+        "holding_months": 6,
+        "total_holding_cost": 2822.24
+      },
+      "score": {
+        "total": 80.62,
+        "breakdown": {
+          "profit_margin": 28.79,
+          "roi": 25.0,
+          "arv_confidence": 15.7,
+          "distress": 6.15,
+          "equity_spread": 4.98
+        }
+      }
+    },
+    {
+      "property_id": "295b3264-68dd-4f66-812b-cf7eee116f65",
+      "address": {
+        "street": "6749 Lake Ln",
+        "city": "Indianapolis",
+        "state": "IN",
+        "zip": "46201",
+        "county": "Indianapolis County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "sqft": 1891,
+        "year_built": 1960
+      },
+      "distress": {
+        "types": [
+          "divorce"
+        ],
+        "score": 36
+      },
+      "arv": {
+        "value": 284075.53,
+        "confidence": "medium",
+        "confidence_score": 70.4,
+        "comp_count": 4,
+        "price_per_sqft_avg": 151.98
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 59600.0,
+        "cost_per_sqft": 31.52,
+        "regional_multiplier": 0.93
+      },
+      "deal": {
+        "list_price": 110961.56,
+        "max_allowable_offer": 139252.87,
+        "estimated_profit": 88703.77,
+        "roi_pct": 50.55,
+        "cash_invested": 175486.48,
+        "equity_spread": -28291.31,
+        "holding_months": 6,
+        "total_holding_cost": 2705.68
+      },
+      "score": {
+        "total": 80.46,
+        "breakdown": {
+          "profit_margin": 30.0,
+          "roi": 25.0,
+          "arv_confidence": 14.08,
+          "distress": 5.4,
+          "equity_spread": 5.98
+        }
+      }
+    },
+    {
+      "property_id": "6f2d8df1-d53f-478d-b23b-152c564ee6b7",
+      "address": {
+        "street": "7564 Lincoln Ct",
+        "city": "Jacksonville",
+        "state": "FL",
+        "zip": "32209",
+        "county": "Jacksonville County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 2.0,
+        "sqft": 2720,
+        "year_built": 1952
+      },
+      "distress": {
+        "types": [
+          "pre_foreclosure",
+          "tax_lien"
+        ],
+        "score": 77
+      },
+      "arv": {
+        "value": 454655.17,
+        "confidence": "high",
+        "confidence_score": 76.3,
+        "comp_count": 6,
+        "price_per_sqft_avg": 161.22
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 101400.0,
+        "cost_per_sqft": 37.28,
+        "regional_multiplier": 1.1
+      },
+      "deal": {
+        "list_price": 215576.31,
+        "max_allowable_offer": 216858.62,
+        "estimated_profit": 98092.35,
+        "roi_pct": 30.21,
+        "cash_invested": 324736.96,
+        "equity_spread": -1282.31,
+        "holding_months": 6,
+        "total_holding_cost": 3449.12
+      },
+      "score": {
+        "total": 73.05,
+        "breakdown": {
+          "profit_margin": 21.58,
+          "roi": 22.55,
+          "arv_confidence": 15.26,
+          "distress": 11.55,
+          "equity_spread": 2.11
+        }
+      }
+    },
+    {
+      "property_id": "14fc83fa-ce83-46b0-be00-bba5aed20c3e",
+      "address": {
+        "street": "9088 Elm Pl",
+        "city": "Jacksonville",
+        "state": "FL",
+        "zip": "32209",
+        "county": "Jacksonville County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 2.0,
+        "sqft": 1336,
+        "year_built": 1963
+      },
+      "distress": {
+        "types": [
+          "auction"
+        ],
+        "score": 88
+      },
+      "arv": {
+        "value": 230665.28,
+        "confidence": "medium",
+        "confidence_score": 74.6,
+        "comp_count": 8,
+        "price_per_sqft_avg": 165.43
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 49800.0,
+        "cost_per_sqft": 37.28,
+        "regional_multiplier": 1.1
+      },
+      "deal": {
+        "list_price": 115116.87,
+        "max_allowable_offer": 111665.7,
+        "estimated_profit": 44558.65,
+        "roi_pct": 26.22,
+        "cash_invested": 169960.06,
+        "equity_spread": 3451.17,
+        "holding_months": 6,
+        "total_holding_cost": 2740.85
+      },
+      "score": {
+        "total": 70.39,
+        "breakdown": {
+          "profit_margin": 19.32,
+          "roi": 21.55,
+          "arv_confidence": 14.92,
+          "distress": 13.2,
+          "equity_spread": 1.4
+        }
+      }
+    },
+    {
+      "property_id": "638db506-26e8-4269-aec9-0a7a99ad01bf",
+      "address": {
+        "street": "7627 Park Ave",
+        "city": "Atlanta",
+        "state": "GA",
+        "zip": "30310",
+        "county": "Atlanta County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 2.0,
+        "sqft": 1900,
+        "year_built": 1994
+      },
+      "distress": {
+        "types": [
+          "probate"
+        ],
+        "score": 46
+      },
+      "arv": {
+        "value": 350214.93,
+        "confidence": "high",
+        "confidence_score": 76.0,
+        "comp_count": 6,
+        "price_per_sqft_avg": 181.7
+      },
+      "rehab": {
+        "level": "cosmetic",
+        "total_cost": 19300.0,
+        "cost_per_sqft": 10.16,
+        "regional_multiplier": 1.0
+      },
+      "deal": {
+        "list_price": 219868.65,
+        "max_allowable_offer": 225850.45,
+        "estimated_profit": 78764.09,
+        "roi_pct": 31.9,
+        "cash_invested": 246935.8,
+        "equity_spread": -5981.8,
+        "holding_months": 6,
+        "total_holding_cost": 3369.78
+      },
+      "score": {
+        "total": 70.25,
+        "breakdown": {
+          "profit_margin": 22.49,
+          "roi": 22.97,
+          "arv_confidence": 15.2,
+          "distress": 6.9,
+          "equity_spread": 2.68
+        }
+      }
+    },
+    {
+      "property_id": "e62e017b-18ff-4f6b-b789-686e776d841e",
+      "address": {
+        "street": "1182 Highland Blvd",
+        "city": "Detroit",
+        "state": "MI",
+        "zip": "48208",
+        "county": "Detroit County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 2,
+        "bathrooms": 2.0,
+        "sqft": 2058,
+        "year_built": 1942
+      },
+      "distress": {
+        "types": [
+          "bankruptcy"
+        ],
+        "score": 57
+      },
+      "arv": {
+        "value": 213235.77,
+        "confidence": "high",
+        "confidence_score": 75.9,
+        "comp_count": 7,
+        "price_per_sqft_avg": 102.83
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 62800.0,
+        "cost_per_sqft": 30.52,
+        "regional_multiplier": 0.9
+      },
+      "deal": {
+        "list_price": 86329.99,
+        "max_allowable_offer": 86465.04,
+        "estimated_profit": 44889.97,
+        "roi_pct": 29.26,
+        "cash_invested": 153419.3,
+        "equity_spread": -135.05,
+        "holding_months": 6,
+        "total_holding_cost": 2562.71
+      },
+      "score": {
+        "total": 69.12,
+        "breakdown": {
+          "profit_margin": 21.05,
+          "roi": 22.31,
+          "arv_confidence": 15.18,
+          "distress": 8.55,
+          "equity_spread": 2.03
+        }
+      }
+    },
+    {
+      "property_id": "7201bbb0-b0e1-4108-a858-6c12c51f1c99",
+      "address": {
+        "street": "5517 Park Dr",
+        "city": "Cleveland",
+        "state": "OH",
+        "zip": "44105",
+        "county": "Cleveland County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "sqft": 1373,
+        "year_built": 1959
+      },
+      "distress": {
+        "types": [
+          "pre_foreclosure"
+        ],
+        "score": 55
+      },
+      "arv": {
+        "value": 147485.98,
+        "confidence": "high",
+        "confidence_score": 77.2,
+        "comp_count": 6,
+        "price_per_sqft_avg": 106.18
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 42700.0,
+        "cost_per_sqft": 31.1,
+        "regional_multiplier": 0.92
+      },
+      "deal": {
+        "list_price": 59990.16,
+        "max_allowable_offer": 60540.19,
+        "estimated_profit": 30847.81,
+        "roi_pct": 29.02,
+        "cash_invested": 106314.15,
+        "equity_spread": -550.03,
+        "holding_months": 6,
+        "total_holding_cost": 2424.19
+      },
+      "score": {
+        "total": 69.01,
+        "breakdown": {
+          "profit_margin": 20.92,
+          "roi": 22.25,
+          "arv_confidence": 15.44,
+          "distress": 8.25,
+          "equity_spread": 2.15
+        }
+      }
+    },
+    {
+      "property_id": "0d836553-e81a-40c5-a6d2-03588779a03b",
+      "address": {
+        "street": "2239 Jefferson Ave",
+        "city": "Jacksonville",
+        "state": "FL",
+        "zip": "32209",
+        "county": "Jacksonville County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.0,
+        "sqft": 1202,
+        "year_built": 1942
+      },
+      "distress": {
+        "types": [
+          "probate"
+        ],
+        "score": 57
+      },
+      "arv": {
+        "value": 206826.41,
+        "confidence": "medium",
+        "confidence_score": 74.6,
+        "comp_count": 6,
+        "price_per_sqft_avg": 170.2
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 44700.0,
+        "cost_per_sqft": 37.19,
+        "regional_multiplier": 1.1
+      },
+      "deal": {
+        "list_price": 100569.49,
+        "max_allowable_offer": 100078.49,
+        "estimated_profit": 42380.54,
+        "roi_pct": 28.26,
+        "cash_invested": 149968.02,
+        "equity_spread": 491.0,
+        "holding_months": 6,
+        "total_holding_cost": 2687.14
+      },
+      "score": {
+        "total": 67.93,
+        "breakdown": {
+          "profit_margin": 20.49,
+          "roi": 22.06,
+          "arv_confidence": 14.92,
+          "distress": 8.55,
+          "equity_spread": 1.91
+        }
+      }
+    },
+    {
+      "property_id": "b7fa9e1a-fc5e-400e-9470-af1abfec03d5",
+      "address": {
+        "street": "6831 Martin Luther King Ct",
+        "city": "Cleveland",
+        "state": "OH",
+        "zip": "44105",
+        "county": "Cleveland County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.5,
+        "sqft": 2253,
+        "year_built": 1988
+      },
+      "distress": {
+        "types": [
+          "pre_foreclosure",
+          "tax_lien"
+        ],
+        "score": 78
+      },
+      "arv": {
+        "value": 247368.85,
+        "confidence": "high",
+        "confidence_score": 77.6,
+        "comp_count": 6,
+        "price_per_sqft_avg": 112.55
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 70200.0,
+        "cost_per_sqft": 31.16,
+        "regional_multiplier": 0.92
+      },
+      "deal": {
+        "list_price": 110233.55,
+        "max_allowable_offer": 102958.2,
+        "estimated_profit": 44586.22,
+        "roi_pct": 24.04,
+        "cash_invested": 185466.81,
+        "equity_spread": 7275.35,
+        "holding_months": 6,
+        "total_holding_cost": 2828.59
+      },
+      "score": {
+        "total": 67.08,
+        "breakdown": {
+          "profit_margin": 18.02,
+          "roi": 21.01,
+          "arv_confidence": 15.52,
+          "distress": 11.7,
+          "equity_spread": 0.82
+        }
+      }
+    },
+    {
+      "property_id": "afe7ef1a-a2f2-4085-ad06-55805913d37d",
+      "address": {
+        "street": "8015 Elm Dr",
+        "city": "Cleveland",
+        "state": "OH",
+        "zip": "44105",
+        "county": "Cleveland County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 3,
+        "bathrooms": 2.0,
+        "sqft": 2788,
+        "year_built": 1941
+      },
+      "distress": {
+        "types": [
+          "pre_foreclosure",
+          "tax_lien"
+        ],
+        "score": 84
+      },
+      "arv": {
+        "value": 335804.92,
+        "confidence": "high",
+        "confidence_score": 79.1,
+        "comp_count": 6,
+        "price_per_sqft_avg": 114.07
+      },
+      "rehab": {
+        "level": "moderate",
+        "total_cost": 86900.0,
+        "cost_per_sqft": 31.17,
+        "regional_multiplier": 0.92
+      },
+      "deal": {
+        "list_price": 162695.44,
+        "max_allowable_offer": 148163.44,
+        "estimated_profit": 56419.61,
+        "roi_pct": 22.05,
+        "cash_invested": 255878.97,
+        "equity_spread": 14532.0,
+        "holding_months": 6,
+        "total_holding_cost": 3029.62
+      },
+      "score": {
+        "total": 66.0,
+        "breakdown": {
+          "profit_margin": 16.8,
+          "roi": 20.51,
+          "arv_confidence": 15.82,
+          "distress": 12.6,
+          "equity_spread": 0.27
+        }
+      }
+    },
+    {
+      "property_id": "3738ce3d-e626-4de2-8790-f6ffbbb3d5d5",
+      "address": {
+        "street": "1978 Lake Pl",
+        "city": "Cleveland",
+        "state": "OH",
+        "zip": "44105",
+        "county": "Cleveland County"
+      },
+      "property_details": {
+        "type": "sfr",
+        "bedrooms": 4,
+        "bathrooms": 1.0,
+        "sqft": 921,
+        "year_built": 1993
+      },
+      "distress": {
+        "types": [
+          "tax_lien"
+        ],
+        "score": 44
+      },
+      "arv": {
+        "value": 109078.04,
+        "confidence": "high",
+        "confidence_score": 77.8,
+        "comp_count": 6,
+        "price_per_sqft_avg": 115.72
+      },
+      "rehab": {
+        "level": "cosmetic",
+        "total_cost": 8600.0,
+        "cost_per_sqft": 9.34,
+        "regional_multiplier": 0.92
+      },
+      "deal": {
+        "list_price": 67986.85,
+        "max_allowable_offer": 67754.63,
+        "estimated_profit": 20986.05,
+        "roi_pct": 26.08,
+        "cash_invested": 80456.53,
+        "equity_spread": 232.22,
+        "holding_months": 6,
+        "total_holding_cost": 2509.94
+      },
+      "score": {
+        "total": 64.84,
+        "breakdown": {
+          "profit_margin": 19.24,
+          "roi": 21.52,
+          "arv_confidence": 15.56,
+          "distress": 6.6,
+          "equity_spread": 1.91
+        }
+      }
+    }
+  ]
+}

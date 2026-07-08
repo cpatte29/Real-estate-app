@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Lead Report — 2026-07-08</title>
+<style>
+  :root {
+    --green: #22c55e; --yellow: #eab308; --red: #ef4444;
+    --blue: #3b82f6; --gray: #6b7280; --dark: #111827;
+    --card-bg: #1f2937; --bg: #111827;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: var(--bg); color: #f9fafb; padding: 24px; }
+  h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--gray); margin-bottom: 32px; font-size: 0.9rem; }
+
+  /* Summary strip */
+  .summary-strip { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+                    gap: 16px; margin-bottom: 32px; }
+  .stat { background: var(--card-bg); border-radius: 12px; padding: 20px; }
+  .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--green); }
+  .stat-label { font-size: 0.8rem; color: var(--gray); margin-top: 4px; }
+
+  /* Rejection table */
+  .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; }
+  .rejection-section { background: var(--card-bg); border-radius: 12px;
+                        padding: 20px; margin-bottom: 32px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 12px; text-align: left; font-size: 0.875rem; }
+  th { color: var(--gray); border-bottom: 1px solid #374151; }
+  tr:not(:last-child) td { border-bottom: 1px solid #374151; }
+
+  /* Lead card */
+  .card { background: var(--card-bg); border-radius: 16px; padding: 24px;
+           margin-bottom: 24px; border: 1px solid #374151; }
+  .card-header { display: flex; gap: 16px; align-items: flex-start;
+                  margin-bottom: 20px; }
+  .rank { font-size: 1.4rem; font-weight: 700; color: var(--gray);
+           min-width: 36px; }
+  .address { font-size: 1.1rem; font-weight: 600; }
+  .sub-address { color: var(--gray); font-size: 0.85rem; margin-top: 2px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .badge { background: #374151; color: #e5e7eb; font-size: 0.7rem;
+            padding: 2px 8px; border-radius: 9999px; }
+  .address-block { flex: 1; }
+  .score-circle { width: 68px; height: 68px; border-radius: 50%;
+                   display: flex; flex-direction: column; align-items: center;
+                   justify-content: center; flex-shrink: 0; }
+  .score-num { font-size: 1.3rem; font-weight: 700; color: white; line-height: 1; }
+  .score-lbl { font-size: 0.6rem; color: rgba(255,255,255,0.8); text-transform: uppercase; }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+                   gap: 16px; margin-bottom: 16px; }
+  .metric { background: #374151; border-radius: 10px; padding: 14px; }
+  .highlight-green { border: 1px solid var(--green); }
+  .metric-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .05em;
+                   color: var(--gray); margin-bottom: 4px; }
+  .metric-value { font-size: 1.15rem; font-weight: 700; }
+  .metric-sub { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
+  .conf-badge { color: white; font-size: 0.65rem; padding: 1px 6px;
+                 border-radius: 4px; font-weight: 600; }
+  .prop-details { font-size: 0.8rem; color: var(--gray); margin-bottom: 16px; }
+
+  /* Score bars */
+  .score-bar-section { background: #374151; border-radius: 10px; padding: 14px; }
+  .score-bar-label { font-size: 0.7rem; text-transform: uppercase;
+                      color: var(--gray); margin-bottom: 10px; }
+  .score-row { display: flex; align-items: center; gap: 8px;
+                margin-bottom: 6px; font-size: 0.8rem; }
+  .score-cat { width: 120px; color: #d1d5db; flex-shrink: 0; }
+  .bar-track { flex: 1; background: #1f2937; border-radius: 4px; height: 8px; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+  .score-val { width: 32px; text-align: right; color: var(--gray); }
+
+  @media (max-width: 600px) {
+    .summary-strip { grid-template-columns: 1fr 1fr; }
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🏠 Daily Lead Scanner Report</h1>
+<div class="subtitle">
+  Run date: <strong>2026-07-08</strong> ·
+  Run ID: 09bb235a… ·
+  Stop: Qualified Limit ·
+  Generated: 2026-07-08 13:32 UTC
+</div>
+
+<div class="summary-strip">
+  <div class="stat">
+    <div class="stat-value">25</div>
+    <div class="stat-label">Qualified Leads</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">302</div>
+    <div class="stat-label">Candidates Checked</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">7</div>
+    <div class="stat-label">Iterations</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" style="color:#eab308">277</div>
+    <div class="stat-label">Rejected</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">$2,552,978</div>
+    <div class="stat-label">Total Est. Profit Pool</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">80.2</div>
+    <div class="stat-label">Avg Opportunity Score</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">66.3%</div>
+    <div class="stat-label">Avg Estimated ROI</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">
+      8.3%
+    </div>
+    <div class="stat-label">Acceptance Rate</div>
+  </div>
+</div>
+
+<div class="rejection-section">
+  <div class="section-title">Rejection Breakdown</div>
+  <table>
+    <thead><tr><th>Reason</th><th>Count</th></tr></thead>
+    <tbody><tr><td>Low Arv Confidence</td><td>141</td></tr>
+<tr><td>Insufficient Comps</td><td>83</td></tr>
+<tr><td>Insufficient Profit</td><td>31</td></tr>
+<tr><td>Missing Address</td><td>18</td></tr>
+<tr><td>Failed Mao Rule</td><td>4</td></tr></tbody>
+  </table>
+</div>
+
+<div class="section-title">Top Qualified Leads</div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#1</div>
+        <div class="address-block">
+          <div class="address">2110 Martin Luther King Way</div>
+          <div class="sub-address">Kansas City, MO 64130</div>
+          <div class="badges"><span class="badge">Pre Foreclosure</span> <span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">95</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$430,677</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            8 comps · $153/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$75,025</div>
+          <div class="metric-sub">Assessed: $71,907</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$83,700</div>
+          <div class="metric-sub">$31/sqft
+            · 0.91× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$237,773</div>
+          <div class="metric-sub">ROI: 146.1%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$217,774</div>
+          <div class="metric-sub">Spread: $-142,750</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,531</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 1.5ba ·
+        2,713 sqft · Built 1970 ·
+        Kansas City, MO ·
+        Owner: Owner 6187
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.10000000000001%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.4</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:95.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#2</div>
+        <div class="address-block">
+          <div class="address">8452 Elm Ln</div>
+          <div class="sub-address">Atlanta, GA 30310</div>
+          <div class="badges"><span class="badge">Auction</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">92</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$270,404</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $190/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$72,453</div>
+          <div class="metric-sub">Assessed: $73,070</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$51,000</div>
+          <div class="metric-sub">$34/sqft
+            · 1.00× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$124,036</div>
+          <div class="metric-sub">ROI: 97.3%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$138,283</div>
+          <div class="metric-sub">Spread: $-65,830</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,538</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.0ba ·
+        1,509 sqft · Built 1956 ·
+        Atlanta, GA ·
+        Owner: Owner 6917
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:79.5%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:73.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">10.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#3</div>
+        <div class="address-block">
+          <div class="address">5677 Oak Dr</div>
+          <div class="sub-address">Kansas City, MO 64130</div>
+          <div class="badges"><span class="badge">Auction</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">91</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$362,572</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            6 comps · $142/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$68,879</div>
+          <div class="metric-sub">Assessed: $73,683</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$76,800</div>
+          <div class="metric-sub">$31/sqft
+            · 0.91× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$187,594</div>
+          <div class="metric-sub">ROI: 125.4%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$177,001</div>
+          <div class="metric-sub">Spread: $-108,122</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,542</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        2bd / 2.0ba ·
+        2,493 sqft · Built 1952 ·
+        Kansas City, MO ·
+        Owner: Owner 7606
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:73.7%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.7</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">11.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#4</div>
+        <div class="address-block">
+          <div class="address">6598 Pine Ct</div>
+          <div class="sub-address">Birmingham, AL 35204</div>
+          <div class="badges"><span class="badge">Bankruptcy</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">89</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$295,182</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $119/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$90,583</div>
+          <div class="metric-sub">Assessed: $90,192</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$71,200</div>
+          <div class="metric-sub">$30/sqft
+            · 0.88× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$108,283</div>
+          <div class="metric-sub">ROI: 65.1%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$135,427</div>
+          <div class="metric-sub">Spread: $-44,844</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,641</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        2bd / 2.0ba ·
+        2,394 sqft · Built 1942 ·
+        Birmingham, AL ·
+        Owner: Owner 9193
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:76.5%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.3</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:70.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">10.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:80.80000000000001%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">8.1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#5</div>
+        <div class="address-block">
+          <div class="address">8889 Elm Blvd</div>
+          <div class="sub-address">Atlanta, GA 30310</div>
+          <div class="badges"><span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">89</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$299,332</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $165/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$71,040</div>
+          <div class="metric-sub">Assessed: $73,587</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$61,000</div>
+          <div class="metric-sub">$34/sqft
+            · 1.00× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$142,377</div>
+          <div class="metric-sub">ROI: 104.7%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$148,533</div>
+          <div class="metric-sub">Spread: $-77,493</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,542</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.5ba ·
+        1,802 sqft · Built 1957 ·
+        Atlanta, GA ·
+        Owner: Owner 7060
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.9%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:55.00000000000001%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">8.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#6</div>
+        <div class="address-block">
+          <div class="address">4457 Oak St</div>
+          <div class="sub-address">Indianapolis, IN 46201</div>
+          <div class="badges"><span class="badge">Auction</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">89</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$253,153</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            7 comps · $142/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$89,593</div>
+          <div class="metric-sub">Assessed: $82,760</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$58,700</div>
+          <div class="metric-sub">$31/sqft
+            · 0.93× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$82,751</div>
+          <div class="metric-sub">ROI: 54.2%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$118,507</div>
+          <div class="metric-sub">Spread: $-28,914</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,597</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 1.0ba ·
+        1,865 sqft · Built 1982 ·
+        Indianapolis, IN ·
+        Owner: Owner 2300
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:74.7%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:81.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">12.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:65.7%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#7</div>
+        <div class="address-block">
+          <div class="address">2323 Highland Ave</div>
+          <div class="sub-address">Birmingham, AL 35204</div>
+          <div class="badges"><span class="badge">Probate</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">88</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$280,799</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $125/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$89,077</div>
+          <div class="metric-sub">Assessed: $97,248</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Cosmetic)</div>
+          <div class="metric-value">$19,600</div>
+          <div class="metric-sub">$9/sqft
+            · 0.88× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$148,001</div>
+          <div class="metric-sub">ROI: 130.8%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$176,959</div>
+          <div class="metric-sub">Spread: $-87,882</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,683</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.5ba ·
+        2,180 sqft · Built 2002 ·
+        Birmingham, AL ·
+        Owner: Owner 8074
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:76.6%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.3</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:52.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">7.8</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#8</div>
+        <div class="address-block">
+          <div class="address">5834 Elm Ave</div>
+          <div class="sub-address">Indianapolis, IN 46201</div>
+          <div class="badges"><span class="badge">Probate</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">88</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$344,312</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            7 comps · $144/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$78,845</div>
+          <div class="metric-sub">Assessed: $72,508</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Cosmetic)</div>
+          <div class="metric-value">$22,700</div>
+          <div class="metric-sub">$10/sqft
+            · 0.93× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$214,553</div>
+          <div class="metric-sub">ROI: 203.1%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$218,318</div>
+          <div class="metric-sub">Spread: $-139,473</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,535</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 2.0ba ·
+        2,386 sqft · Built 1991 ·
+        Indianapolis, IN ·
+        Owner: Owner 7723
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:78.7%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.7</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:46.0%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#9</div>
+        <div class="address-block">
+          <div class="address">6056 Elm St</div>
+          <div class="sub-address">Indianapolis, IN 46201</div>
+          <div class="badges"><span class="badge">Divorce</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">86</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$309,192</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            7 comps · $151/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$78,123</div>
+          <div class="metric-sub">Assessed: $80,209</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$64,000</div>
+          <div class="metric-sub">$32/sqft
+            · 0.93× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$141,282</div>
+          <div class="metric-sub">ROI: 96.6%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$152,434</div>
+          <div class="metric-sub">Spread: $-74,312</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,581</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 2.0ba ·
+        2,026 sqft · Built 1969 ·
+        Indianapolis, IN ·
+        Owner: Owner 2993
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:78.49999999999999%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.7</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:37.0%;background:#eab308"></div>
+            </div>
+            <span class="score-val">5.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#10</div>
+        <div class="address-block">
+          <div class="address">2105 Birch St</div>
+          <div class="sub-address">Atlanta, GA 30310</div>
+          <div class="badges"><span class="badge">Divorce</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">86</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$327,022</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            7 comps · $183/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$90,094</div>
+          <div class="metric-sub">Assessed: $90,579</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$58,900</div>
+          <div class="metric-sub">$34/sqft
+            · 1.00× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$150,692</div>
+          <div class="metric-sub">ROI: 98.2%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$170,016</div>
+          <div class="metric-sub">Spread: $-79,922</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,643</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        2bd / 2.0ba ·
+        1,737 sqft · Built 1945 ·
+        Atlanta, GA ·
+        Owner: Owner 4500
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:79.5%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:33.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">5.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#11</div>
+        <div class="address-block">
+          <div class="address">9554 Lake Pl</div>
+          <div class="sub-address">Memphis, TN 38109</div>
+          <div class="badges"><span class="badge">Probate</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">84</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$304,971</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            8 comps · $123/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$100,352</div>
+          <div class="metric-sub">Assessed: $95,581</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$77,900</div>
+          <div class="metric-sub">$32/sqft
+            · 0.95× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$100,690</div>
+          <div class="metric-sub">ROI: 55.0%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$135,579</div>
+          <div class="metric-sub">Spread: $-35,227</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,673</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 1.5ba ·
+        2,418 sqft · Built 1983 ·
+        Memphis, TN ·
+        Owner: Owner 3081
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.10000000000001%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.4</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:48.00000000000001%;background:#eab308"></div>
+            </div>
+            <span class="score-val">7.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:66.2%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#12</div>
+        <div class="address-block">
+          <div class="address">2844 Martin Luther King Dr</div>
+          <div class="sub-address">Jacksonville, FL 32209</div>
+          <div class="badges"><span class="badge">Pre Foreclosure</span> <span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">84</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$244,535</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            7 comps · $157/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$100,976</div>
+          <div class="metric-sub">Assessed: $90,033</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$55,300</div>
+          <div class="metric-sub">$37/sqft
+            · 1.10× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$66,482</div>
+          <div class="metric-sub">ROI: 41.3%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$115,875</div>
+          <div class="metric-sub">Spread: $-14,898</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,640</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        2bd / 2.0ba ·
+        1,486 sqft · Built 1974 ·
+        Jacksonville, FL ·
+        Owner: Owner 4621
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:90.63333333333333%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">27.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:76.2%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.99999999999999%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">11.7</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:44.400000000000006%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">4.4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#13</div>
+        <div class="address-block">
+          <div class="address">2882 Peachtree Ct</div>
+          <div class="sub-address">Birmingham, AL 35204</div>
+          <div class="badges"><span class="badge">Divorce</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">83</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$323,952</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            6 comps · $116/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$159,382</div>
+          <div class="metric-sub">Assessed: $141,926</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Cosmetic)</div>
+          <div class="metric-value">$24,900</div>
+          <div class="metric-sub">$9/sqft
+            · 0.88× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$110,854</div>
+          <div class="metric-sub">ROI: 58.2%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$201,866</div>
+          <div class="metric-sub">Spread: $-42,484</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,952</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 1.0ba ·
+        2,781 sqft · Built 2004 ·
+        Birmingham, AL ·
+        Owner: Owner 5789
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:74.1%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.8</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:42.0%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.3</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:72.5%;background:#eab308"></div>
+            </div>
+            <span class="score-val">7.2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#14</div>
+        <div class="address-block">
+          <div class="address">559 Martin Luther King St</div>
+          <div class="sub-address">Atlanta, GA 30310</div>
+          <div class="badges"><span class="badge">Auction</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">83</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$369,096</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            6 comps · $180/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$171,409</div>
+          <div class="metric-sub">Assessed: $167,015</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$68,900</div>
+          <div class="metric-sub">$34/sqft
+            · 1.00× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$96,421</div>
+          <div class="metric-sub">ROI: 39.1%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$189,468</div>
+          <div class="metric-sub">Spread: $-18,059</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$3,102</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 1.0ba ·
+        2,035 sqft · Built 1969 ·
+        Atlanta, GA ·
+        Owner: Owner 6055
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:87.06666666666666%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">26.1</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:99.08%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">24.8</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:75.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:87.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">13.1</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:39.6%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">4.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#15</div>
+        <div class="address-block">
+          <div class="address">7502 Elm Blvd</div>
+          <div class="sub-address">Indianapolis, IN 46201</div>
+          <div class="badges"><span class="badge">Code Violation</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">81</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$315,898</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $130/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$119,217</div>
+          <div class="metric-sub">Assessed: $120,374</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$78,400</div>
+          <div class="metric-sub">$31/sqft
+            · 0.93× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$90,962</div>
+          <div class="metric-sub">ROI: 44.9%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$142,729</div>
+          <div class="metric-sub">Spread: $-23,512</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,822</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.5ba ·
+        2,495 sqft · Built 1998 ·
+        Indianapolis, IN ·
+        Owner: Owner 2375
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:95.96666666666667%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">28.8</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:78.49999999999999%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.7</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:41.0%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:49.800000000000004%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">5.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#16</div>
+        <div class="address-block">
+          <div class="address">6749 Lake Ln</div>
+          <div class="sub-address">Indianapolis, IN 46201</div>
+          <div class="badges"><span class="badge">Divorce</span></div>
+        </div>
+        <div class="score-circle" style="background:#22c55e">
+          <div class="score-num">80</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$284,076</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            4 comps · $152/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$110,962</div>
+          <div class="metric-sub">Assessed: $100,947</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$59,600</div>
+          <div class="metric-sub">$32/sqft
+            · 0.93× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$88,704</div>
+          <div class="metric-sub">ROI: 50.5%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$139,253</div>
+          <div class="metric-sub">Spread: $-28,291</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,706</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 2.0ba ·
+        1,891 sqft · Built 1960 ·
+        Indianapolis, IN ·
+        Owner: Owner 8717
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">30.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:100.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">25.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:70.39999999999999%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.1</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:36.00000000000001%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">5.4</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:59.80000000000001%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#17</div>
+        <div class="address-block">
+          <div class="address">7564 Lincoln Ct</div>
+          <div class="sub-address">Jacksonville, FL 32209</div>
+          <div class="badges"><span class="badge">Pre Foreclosure</span> <span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">73</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$454,655</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $161/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$215,576</div>
+          <div class="metric-sub">Assessed: $224,853</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$101,400</div>
+          <div class="metric-sub">$37/sqft
+            · 1.10× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$98,092</div>
+          <div class="metric-sub">ROI: 30.2%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$216,859</div>
+          <div class="metric-sub">Spread: $-1,282</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$3,449</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 2.0ba ·
+        2,720 sqft · Built 1952 ·
+        Jacksonville, FL ·
+        Owner: Owner 5745
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:71.93333333333332%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">21.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:90.2%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">22.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:76.3%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.3</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">11.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:21.099999999999998%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">2.1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#18</div>
+        <div class="address-block">
+          <div class="address">9088 Elm Pl</div>
+          <div class="sub-address">Jacksonville, FL 32209</div>
+          <div class="badges"><span class="badge">Auction</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">70</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$230,665</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            8 comps · $165/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$115,117</div>
+          <div class="metric-sub">Assessed: $106,809</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$49,800</div>
+          <div class="metric-sub">$37/sqft
+            · 1.10× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$44,559</div>
+          <div class="metric-sub">ROI: 26.2%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$111,666</div>
+          <div class="metric-sub">Spread: $3,451</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,741</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 2.0ba ·
+        1,336 sqft · Built 1963 ·
+        Jacksonville, FL ·
+        Owner: Owner 1757
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:64.4%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">19.3</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:86.2%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">21.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:74.6%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:88.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">13.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:13.999999999999998%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">1.4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#19</div>
+        <div class="address-block">
+          <div class="address">7627 Park Ave</div>
+          <div class="sub-address">Atlanta, GA 30310</div>
+          <div class="badges"><span class="badge">Probate</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">70</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$350,215</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $182/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$219,869</div>
+          <div class="metric-sub">Assessed: $211,629</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Cosmetic)</div>
+          <div class="metric-value">$19,300</div>
+          <div class="metric-sub">$10/sqft
+            · 1.00× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$78,764</div>
+          <div class="metric-sub">ROI: 31.9%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$225,850</div>
+          <div class="metric-sub">Spread: $-5,982</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$3,370</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 2.0ba ·
+        1,900 sqft · Built 1994 ·
+        Atlanta, GA ·
+        Owner: Owner 3477
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:74.96666666666665%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">22.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:91.88%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">23.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:76.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:46.0%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:26.8%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">2.7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#20</div>
+        <div class="address-block">
+          <div class="address">1182 Highland Blvd</div>
+          <div class="sub-address">Detroit, MI 48208</div>
+          <div class="badges"><span class="badge">Bankruptcy</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">69</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$213,236</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            7 comps · $103/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$86,330</div>
+          <div class="metric-sub">Assessed: $77,119</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$62,800</div>
+          <div class="metric-sub">$31/sqft
+            · 0.90× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$44,890</div>
+          <div class="metric-sub">ROI: 29.3%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$86,465</div>
+          <div class="metric-sub">Spread: $-135</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,563</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        2bd / 2.0ba ·
+        2,058 sqft · Built 1942 ·
+        Detroit, MI ·
+        Owner: Owner 8982
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:70.16666666666667%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">21.1</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:89.24%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">22.3</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:75.9%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:57.00000000000001%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">8.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:20.299999999999997%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">2.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#21</div>
+        <div class="address-block">
+          <div class="address">5517 Park Dr</div>
+          <div class="sub-address">Cleveland, OH 44105</div>
+          <div class="badges"><span class="badge">Pre Foreclosure</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">69</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$147,486</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $106/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$59,990</div>
+          <div class="metric-sub">Assessed: $54,031</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$42,700</div>
+          <div class="metric-sub">$31/sqft
+            · 0.92× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$30,848</div>
+          <div class="metric-sub">ROI: 29.0%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$60,540</div>
+          <div class="metric-sub">Spread: $-550</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,424</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 2.0ba ·
+        1,373 sqft · Built 1959 ·
+        Cleveland, OH ·
+        Owner: Owner 6240
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:69.73333333333333%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">20.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:89.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">22.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.2%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.4</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:55.00000000000001%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">8.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:21.5%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">2.1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#22</div>
+        <div class="address-block">
+          <div class="address">2239 Jefferson Ave</div>
+          <div class="sub-address">Jacksonville, FL 32209</div>
+          <div class="badges"><span class="badge">Probate</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">68</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$206,826</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#eab308">MED</span>
+            6 comps · $170/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$100,569</div>
+          <div class="metric-sub">Assessed: $97,858</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$44,700</div>
+          <div class="metric-sub">$37/sqft
+            · 1.10× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$42,381</div>
+          <div class="metric-sub">ROI: 28.3%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$100,078</div>
+          <div class="metric-sub">Spread: $491</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,687</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.0ba ·
+        1,202 sqft · Built 1942 ·
+        Jacksonville, FL ·
+        Owner: Owner 9136
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:68.3%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">20.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:88.24%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">22.1</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:74.6%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">14.9</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:57.00000000000001%;background:#22c55e"></div>
+            </div>
+            <span class="score-val">8.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:19.1%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">1.9</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#23</div>
+        <div class="address-block">
+          <div class="address">6831 Martin Luther King Ct</div>
+          <div class="sub-address">Cleveland, OH 44105</div>
+          <div class="badges"><span class="badge">Pre Foreclosure</span> <span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">67</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$247,369</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $113/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$110,234</div>
+          <div class="metric-sub">Assessed: $121,431</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$70,200</div>
+          <div class="metric-sub">$31/sqft
+            · 0.92× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$44,586</div>
+          <div class="metric-sub">ROI: 24.0%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$102,958</div>
+          <div class="metric-sub">Spread: $7,275</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,829</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.5ba ·
+        2,253 sqft · Built 1988 ·
+        Cleveland, OH ·
+        Owner: Owner 2510
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:60.06666666666667%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">18.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:84.04%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">21.0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.60000000000001%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.99999999999999%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">11.7</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:8.2%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">0.8</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#24</div>
+        <div class="address-block">
+          <div class="address">8015 Elm Dr</div>
+          <div class="sub-address">Cleveland, OH 44105</div>
+          <div class="badges"><span class="badge">Pre Foreclosure</span> <span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">66</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$335,805</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $114/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$162,695</div>
+          <div class="metric-sub">Assessed: $154,936</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Moderate)</div>
+          <div class="metric-value">$86,900</div>
+          <div class="metric-sub">$31/sqft
+            · 0.92× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$56,420</div>
+          <div class="metric-sub">ROI: 22.1%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$148,163</div>
+          <div class="metric-sub">Spread: $14,532</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$3,030</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        3bd / 2.0ba ·
+        2,788 sqft · Built 1941 ·
+        Cleveland, OH ·
+        Owner: Owner 6939
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:56.00000000000001%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">16.8</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:82.04%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">20.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:79.10000000000001%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.8</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:84.0%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">12.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:2.7%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">0.3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="rank">#25</div>
+        <div class="address-block">
+          <div class="address">1978 Lake Pl</div>
+          <div class="sub-address">Cleveland, OH 44105</div>
+          <div class="badges"><span class="badge">Tax Lien</span></div>
+        </div>
+        <div class="score-circle" style="background:#eab308">
+          <div class="score-num">65</div>
+          <div class="score-lbl">Score</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="metric-label">ARV</div>
+          <div class="metric-value">$109,078</div>
+          <div class="metric-sub">
+            <span class="conf-badge" style="background:#22c55e">HIGH</span>
+            6 comps · $116/sqft
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">List Price</div>
+          <div class="metric-value">$67,987</div>
+          <div class="metric-sub">Assessed: $68,324</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Rehab (Cosmetic)</div>
+          <div class="metric-value">$8,600</div>
+          <div class="metric-sub">$9/sqft
+            · 0.92× regional</div>
+        </div>
+        <div class="metric highlight-green">
+          <div class="metric-label">Est. Profit</div>
+          <div class="metric-value">$20,986</div>
+          <div class="metric-sub">ROI: 26.1%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Max Offer (70%)</div>
+          <div class="metric-value">$67,755</div>
+          <div class="metric-sub">Spread: $232</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Holding Cost</div>
+          <div class="metric-value">$2,510</div>
+          <div class="metric-sub">6 months</div>
+        </div>
+      </div>
+
+      <div class="prop-details">
+        4bd / 1.0ba ·
+        921 sqft · Built 1993 ·
+        Cleveland, OH ·
+        Owner: Owner 9177
+      </div>
+
+      <div class="score-bar-section">
+        <div class="score-bar-label">Score breakdown</div>
+        <div class="score-bars">
+          
+          <div class="score-row">
+            <span class="score-cat">Profit Margin</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:64.13333333333333%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">19.2</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ROI</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:86.08%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">21.5</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">ARV Confidence</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:77.8%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">15.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Distress Score</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:44.0%;background:#eab308"></div>
+            </div>
+            <span class="score-val">6.6</span>
+          </div>
+          <div class="score-row">
+            <span class="score-cat">Equity Spread</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:19.1%;background:#ef4444"></div>
+            </div>
+            <span class="score-val">1.9</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</body>
+</html>
