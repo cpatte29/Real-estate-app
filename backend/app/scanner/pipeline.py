@@ -40,10 +40,16 @@ class LeadScannerPipeline:
         self.cfg = cfg or default_config
         self._rng = random.Random(self.cfg.simulation_seed)
 
+        # Comp source — use real CSV when path is configured, else simulate
+        comp_source = None
+        if self.cfg.comp_csv_path:
+            from app.scanner.comps.csv_source import CsvCompSource
+            comp_source = CsvCompSource(self.cfg.comp_csv_path)
+
         # Sub-engines
         source = SimulatedPropertySource(seed=self.cfg.simulation_seed)
         self.discovery = PropertyDiscovery(source)
-        self.arv_engine = ARVEngine(rng=self._rng)
+        self.arv_engine = ARVEngine(comp_source=comp_source, rng=self._rng)
         self.rehab_estimator = RehabEstimator()
         self.deal_calculator = DealCalculator()
 

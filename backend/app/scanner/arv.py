@@ -3,23 +3,42 @@ ARV (After-Repair Value) calculation engine.
 
 Selects comparable sales, scores them by similarity, applies adjustments,
 and computes a weighted-average ARV with a confidence level.
+
+Real comp data
+--------------
+Pass a CompSource implementation to ARVEngine to use real sold comps instead
+of the built-in simulation:
+
+    from app.scanner.comps.csv_source import CsvCompSource
+    engine = ARVEngine(comp_source=CsvCompSource("path/to/comps.csv"))
+
+When comp_source is None the engine falls back to the internal simulation,
+which preserves full backwards compatibility.
 """
 from __future__ import annotations
 
 import math
 import random
 import statistics
-from datetime import date, timedelta
+from datetime import date
 from typing import Optional
 from uuid import UUID
 
 from app.scanner.config import config
+from app.scanner.geo import haversine_miles
 from app.scanner.models import (
     ARVConfidence,
     ARVResult,
     CandidateProperty,
     ComparableSale,
 )
+
+# Import the interface for type annotation only — avoids importing concrete classes
+# that would create circular-import issues.
+try:
+    from app.scanner.comps.source import CompSource
+except ImportError:  # pragma: no cover — only fails in unusual bootstrap scenarios
+    CompSource = None  # type: ignore[assignment,misc]
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -46,15 +65,6 @@ def _get_market_ppf(state: str, city: str) -> float:
     return 140.0   # national fallback
 
 
-def _haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    R = 3958.8
-    phi1, phi2 = math.radians(lat1), math.radians(lat2)
-    dphi = math.radians(lat2 - lat1)
-    dlam = math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlam / 2) ** 2
-    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-
 # ──────────────────────────────────────────────────────────────────────────────
 # Comp similarity scoring (0-100)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -79,7 +89,7 @@ def _similarity_score(subject: CandidateProperty, comp: ComparableSale) -> float
     if subject.year_built and comp.year_built:
         score -= abs(subject.year_built - comp.year_built) / 10
 
-    # Recency bonus: sold within 3 months = 0 penalty, 6 months = -10
+    # Recency penalty: sold within 3 months = 0 penalty, 6 months = -10
     months_ago = (date.today() - comp.sale_date).days / 30
     score -= max(0, (months_ago - 3) * (10 / 3))
 
@@ -87,7 +97,7 @@ def _similarity_score(subject: CandidateProperty, comp: ComparableSale) -> float
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Adjustment grid (per-unit cost adjustments applied to comp price)
+# Adjustment grid (per-unit cost adjustments applied to comp sale price)
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _apply_adjustments(subject: CandidateProperty, comp: ComparableSale) -> float:
@@ -101,12 +111,12 @@ def _apply_adjustments(subject: CandidateProperty, comp: ComparableSale) -> floa
     if subject.bathrooms is not None and comp.bathrooms is not None:
         adjustment += (subject.bathrooms - comp.bathrooms) * 3_000
 
-    # Sqft adjustment: price/sqft of comp × sqft delta
+    # Sqft adjustment: comp's $/sqft × sqft delta
     if subject.sqft and comp.sqft and comp.price_per_sqft:
         adjustment += (subject.sqft - comp.sqft) * (comp.price_per_sqft * 0.5)
 
-    # Garage adjustment (~$5k per space)
-    if subject.garage_spaces is not None and comp.sqft:
+    # Garage adjustment (~$3k per space)
+    if subject.garage_spaces:
         adjustment += subject.garage_spaces * 3_000
 
     # Pool adjustment
@@ -117,7 +127,7 @@ def _apply_adjustments(subject: CandidateProperty, comp: ComparableSale) -> floa
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Simulated comparable sales generator
+# Simulated comparable sales generator (internal; used when comp_source is None)
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _generate_simulated_comps(
@@ -129,13 +139,15 @@ def _generate_simulated_comps(
     date_range_months: int,
     sqft_tolerance_pct: int,
 ) -> list[ComparableSale]:
+    """Generate synthetic comps with similarity scores and adjustments pre-applied."""
+    from datetime import timedelta
+
     if not subject.sqft or not subject.latitude or not subject.longitude:
         return []
 
     market_ppf = _get_market_ppf(subject.state, subject.city)
     comps = []
 
-    # Number of comps: sometimes low to exercise VERIFY rejection
     n_comps = rng.choices(
         [0, 1, 2, 3, 4, 5, 6, 7, 8],
         weights=[5, 5, 8, 15, 20, 20, 15, 8, 4],
@@ -147,16 +159,21 @@ def _generate_simulated_comps(
         dist = rng.uniform(0.05, radius_miles)
         angle = rng.uniform(0, 2 * math.pi)
         lat = subject.latitude + (dist / 69.0) * math.cos(angle)
-        lng = subject.longitude + (dist / (69.0 * math.cos(math.radians(subject.latitude)))) * math.sin(angle)
+        lng = subject.longitude + (
+            dist / (69.0 * math.cos(math.radians(subject.latitude)))
+        ) * math.sin(angle)
 
-        sqft_var = rng.uniform(1 - sqft_tolerance_pct / 100, 1 + sqft_tolerance_pct / 100)
+        sqft_var = rng.uniform(
+            1 - sqft_tolerance_pct / 100,
+            1 + sqft_tolerance_pct / 100,
+        )
         comp_sqft = max(500, int(subject.sqft * sqft_var))
 
         days_ago = rng.randint(7, date_range_months * 30)
         sale_date = date.today() - timedelta(days=days_ago)
 
         ppf_var = market_ppf * rng.uniform(0.85, 1.18)
-        sale_price = round(comp_sqft * ppf_var, -2)  # round to $100
+        sale_price = round(comp_sqft * ppf_var, -2)
 
         street_num = rng.randint(100, 9999)
         street = rng.choice(["Oak", "Maple", "Pine", "Elm", "Cedar"])
@@ -201,12 +218,11 @@ def _generate_simulated_comps(
 def _confidence(comp_count: int, stddev_pct: float) -> tuple[ARVConfidence, float]:
     """
     Returns (confidence_enum, numeric_score 0-100).
-    High comp count and low price variance = high confidence.
+    High comp count and low price variance → high confidence.
     """
     if comp_count == 0:
         return ARVConfidence.INSUFFICIENT, 0.0
 
-    # Base from count
     if comp_count >= 6:
         base = 85.0
     elif comp_count >= 4:
@@ -216,7 +232,6 @@ def _confidence(comp_count: int, stddev_pct: float) -> tuple[ARVConfidence, floa
     else:
         base = 35.0
 
-    # Adjust for variance (stddev as % of mean)
     variance_penalty = min(25, stddev_pct * 0.8)
     score = base - variance_penalty
 
@@ -235,7 +250,26 @@ def _confidence(comp_count: int, stddev_pct: float) -> tuple[ARVConfidence, floa
 # ──────────────────────────────────────────────────────────────────────────────
 
 class ARVEngine:
-    def __init__(self, rng: Optional[random.Random] = None):
+    """
+    Calculates After-Repair Value for a candidate property.
+
+    Parameters
+    ----------
+    comp_source:
+        A CompSource implementation that supplies real sold comparables.
+        If None (default), the engine uses its internal simulation — useful
+        for development and tests that do not need real comp data. Existing
+        tests that pass rng= continue to work unchanged.
+    rng:
+        Random number generator. Ignored when comp_source is not None.
+    """
+
+    def __init__(
+        self,
+        comp_source: Optional["CompSource"] = None,
+        rng: Optional[random.Random] = None,
+    ):
+        self._comp_source = comp_source
         self._rng = rng or random.Random(config.simulation_seed)
 
     def calculate(
@@ -252,11 +286,32 @@ class ARVEngine:
         sqft_tolerance_pct = sqft_tolerance_pct or config.arv_sqft_tolerance_pct
         max_comps = max_comps or config.arv_max_comps
 
-        comps = _generate_simulated_comps(
-            subject, scanner_run_id, self._rng,
-            max_comps, radius_miles, date_range_months, sqft_tolerance_pct,
-        )
+        # ── Fetch comps ─────────────────────────────────────────────────────
+        if self._comp_source is not None:
+            # Real data path: fetch raw comps then apply scoring/adjustments here
+            raw = self._comp_source.fetch_candidates(
+                subject,
+                radius_miles=radius_miles,
+                date_range_months=date_range_months,
+                sqft_tolerance_pct=sqft_tolerance_pct,
+                # Over-fetch so we can score and pick the best max_comps
+                max_candidates=max_comps * 4,
+            )
+            for comp in raw:
+                comp.similarity_score = _similarity_score(subject, comp)
+                comp.price_adjustment = _apply_adjustments(subject, comp)
+                comp.adjusted_price = comp.sale_price + comp.price_adjustment
+            comps = sorted(raw, key=lambda c: c.similarity_score, reverse=True)[
+                :max_comps
+            ]
+        else:
+            # Simulation path: comps come pre-scored (unchanged behaviour)
+            comps = _generate_simulated_comps(
+                subject, scanner_run_id, self._rng,
+                max_comps, radius_miles, date_range_months, sqft_tolerance_pct,
+            )
 
+        # ── No comps ────────────────────────────────────────────────────────
         if not comps:
             return ARVResult(
                 property_id=subject.id,
@@ -270,12 +325,14 @@ class ARVEngine:
                 comps=[],
             )
 
-        # Weighted average using similarity scores
+        # ── Weighted-average ARV ─────────────────────────────────────────────
         total_weight = sum(c.similarity_score for c in comps)
         if total_weight == 0:
             arv = statistics.mean(c.adjusted_price for c in comps)
         else:
-            arv = sum(c.adjusted_price * c.similarity_score for c in comps) / total_weight
+            arv = sum(
+                c.adjusted_price * c.similarity_score for c in comps
+            ) / total_weight
 
         prices = [c.adjusted_price for c in comps]
         mean_price = statistics.mean(prices)

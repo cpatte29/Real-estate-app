@@ -2,6 +2,8 @@
 Scanner configuration — all tunable constants in one place.
 Override via environment variables or .env file.
 """
+from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 
@@ -46,6 +48,12 @@ class ScannerConfig(BaseSettings):
     score_weight_arv_confidence: float = 0.20
     score_weight_distress_score: float = 0.15
     score_weight_equity_spread: float = 0.10
+
+    # ── Comp data source ───────────────────────────────────────────
+    # Set to a CSV file path to use real sold comps instead of simulation.
+    # CSV must contain: address, city, state, zip, latitude, longitude,
+    #   sale_date, sale_price, sqft, bedrooms, bathrooms, year_built, property_type
+    comp_csv_path: Optional[str] = None
 
     # ── Data simulation (used when real APIs are unavailable) ──────
     simulate_data: bool = True
