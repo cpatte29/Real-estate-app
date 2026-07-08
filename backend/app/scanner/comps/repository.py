@@ -9,21 +9,40 @@ without a running Postgres instance — it implements the exact same contract.
 from __future__ import annotations
 
 import hashlib
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from app.scanner.geo import haversine_miles
 
+# Common street-suffix spellings collapsed to one form so "123 Oak Street"
+# and "123 Oak St" produce the same dedup key.
+_SUFFIX_MAP = {
+    "street": "st", "avenue": "ave", "drive": "dr", "road": "rd",
+    "lane": "ln", "court": "ct", "boulevard": "blvd", "place": "pl",
+    "circle": "cir", "terrace": "ter", "highway": "hwy", "parkway": "pkwy",
+}
 
-def compute_dedup_key(address: str, sale_date: date, sale_price: float) -> str:
+
+def _normalize_address(address: str) -> str:
+    s = (address or "").strip().lower()
+    s = re.sub(r"[^\w\s]", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    words = [_SUFFIX_MAP.get(w, w) for w in s.split(" ")]
+    return " ".join(words)
+
+
+def compute_dedup_key(address: str, sale_date: date) -> str:
     """
-    Stable fingerprint for a comparable sale record. Prevents the same sale
-    from being stored twice — e.g. re-uploading the same CSV export, or
-    receiving the same sale from two overlapping providers.
+    Stable fingerprint for a comparable sale record — identity is address +
+    sale date, NOT sale price. Providers commonly report the same closed
+    sale with slightly different prices (rounding, later corrections,
+    commission-inclusive vs. exclusive figures); keying on price would let
+    the same sale slip in twice under two different price reports.
     """
-    normalized = f"{(address or '').strip().lower()}|{sale_date.isoformat()}|{round(sale_price, 2)}"
+    normalized = f"{_normalize_address(address)}|{sale_date.isoformat()}"
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:32]
 
 
@@ -54,7 +73,7 @@ class CompRow:
 
     def __post_init__(self):
         if not self.dedup_key:
-            self.dedup_key = compute_dedup_key(self.address, self.sale_date, self.sale_price)
+            self.dedup_key = compute_dedup_key(self.address, self.sale_date)
 
 
 @dataclass
@@ -112,6 +131,21 @@ class CompRepository(ABC):
     def count(self) -> int:
         """Total number of comp rows currently stored."""
 
+    def record_ingestion_run(
+        self,
+        source_name: str,
+        file_name: str,
+        result: IngestResult,
+        started_at: Optional[datetime] = None,
+        completed_at: Optional[datetime] = None,
+    ) -> None:
+        """
+        Optional audit hook, called once per CsvCompIngester.ingest_file()
+        run. No-op by default — override to persist a run record (see
+        PostgresCompRepository, which writes to comp_ingestion_runs).
+        """
+        return None
+
 
 class InMemoryCompRepository(CompRepository):
     """
@@ -122,6 +156,7 @@ class InMemoryCompRepository(CompRepository):
 
     def __init__(self):
         self._rows: dict[str, CompRow] = {}
+        self.ingestion_runs: list[dict] = []
 
     def query_within_radius(
         self,
@@ -153,3 +188,20 @@ class InMemoryCompRepository(CompRepository):
 
     def count(self) -> int:
         return len(self._rows)
+
+    def record_ingestion_run(
+        self,
+        source_name: str,
+        file_name: str,
+        result: IngestResult,
+        started_at: Optional[datetime] = None,
+        completed_at: Optional[datetime] = None,
+    ) -> None:
+        """Captures the call for test assertions instead of discarding it."""
+        self.ingestion_runs.append({
+            "source_name": source_name,
+            "file_name": file_name,
+            "result": result,
+            "started_at": started_at,
+            "completed_at": completed_at,
+        })

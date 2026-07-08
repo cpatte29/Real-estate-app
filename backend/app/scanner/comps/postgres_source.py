@@ -1,6 +1,10 @@
 """
 PostgreSQL + PostGIS-backed CompRepository and CompSource.
 
+Backed by comp_pool (migration 003) — a subject-independent table of raw
+ingested comps, distinct from comparable_sales (which stores per-subject,
+already-scored ARV snapshots and is untouched by this module).
+
 This module does not import a DB driver directly — PostgresCompRepository
 accepts any DB-API 2.0 connection whose cursor yields dict-like rows (e.g.
 psycopg2 with psycopg2.extras.RealDictCursor, or a test double). That keeps
@@ -17,11 +21,12 @@ Usage:
 """
 from __future__ import annotations
 
+import json
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
-from app.scanner.comps.repository import CompRepository, CompRow
+from app.scanner.comps.repository import CompRepository, CompRow, IngestResult
 from app.scanner.comps.source import CompSource
 from app.scanner.models import CandidateProperty, ComparableSale
 
@@ -29,10 +34,20 @@ logger = logging.getLogger(__name__)
 
 _METERS_PER_MILE = 1609.34
 
+
+def _to_float(val) -> Optional[float]:
+    """
+    Cast a DB-driver numeric value (often Decimal for NUMERIC/DECIMAL
+    columns) to float at the persistence boundary, so downstream ARV
+    arithmetic never mixes Decimal and float and raises TypeError.
+    """
+    return float(val) if val is not None else None
+
+
 # ST_DWithin / ST_Distance operate on `geography` so both take meters and
 # account for earth curvature — no manual haversine math needed here.
 _UPSERT_SQL = """
-INSERT INTO comparable_sales (
+INSERT INTO comp_pool (
     address, city, state, zip, location,
     sale_date, sale_price, sqft, bedrooms, bathrooms, year_built,
     property_type, pool, garage_spaces, condition, price_per_sqft,
@@ -59,7 +74,7 @@ SELECT
         location,
         ST_SetSRID(ST_MakePoint(%(longitude)s, %(latitude)s), 4326)::geography
     ) AS distance_meters
-FROM comparable_sales
+FROM comp_pool
 WHERE ST_DWithin(
         location,
         ST_SetSRID(ST_MakePoint(%(longitude)s, %(latitude)s), 4326)::geography,
@@ -71,16 +86,28 @@ ORDER BY distance_meters ASC
 LIMIT %(limit)s
 """
 
-_COUNT_SQL = "SELECT COUNT(*) AS n FROM comparable_sales"
+_COUNT_SQL = "SELECT COUNT(*) AS n FROM comp_pool"
+
+_INSERT_INGESTION_RUN_SQL = """
+INSERT INTO comp_ingestion_runs (
+    source_name, file_name, records_read, records_added, records_skipped,
+    error_count, errors, started_at, completed_at, status
+) VALUES (
+    %(source_name)s, %(file_name)s, %(records_read)s, %(records_added)s, %(records_skipped)s,
+    %(error_count)s, %(errors)s::jsonb, %(started_at)s, %(completed_at)s, %(status)s
+)
+"""
 
 
 class PostgresCompRepository(CompRepository):
     """
-    PostGIS-backed comp storage.
+    PostGIS-backed comp storage (comp_pool table).
 
     Accepts an injected DB-API 2.0 connection (dependency injection keeps
     this class testable without a live database and decoupled from a
-    specific driver). Each write commits immediately.
+    specific driver). Each write commits immediately; any failed statement
+    triggers a rollback so the connection isn't left in an aborted-
+    transaction state for the next call.
     """
 
     def __init__(self, connection):
@@ -111,6 +138,9 @@ class PostgresCompRepository(CompRepository):
         try:
             cur.execute(sql, params)
             db_rows = cur.fetchall()
+        except Exception:
+            self._conn.rollback()
+            raise
         finally:
             cur.close()
 
@@ -118,16 +148,18 @@ class PostgresCompRepository(CompRepository):
         for r in db_rows:
             row = CompRow(
                 address=r["address"], city=r["city"], state=r["state"], zip=r["zip"],
-                latitude=r["latitude"], longitude=r["longitude"],
-                sale_date=r["sale_date"], sale_price=float(r["sale_price"]),
-                sqft=r["sqft"], bedrooms=r["bedrooms"], bathrooms=r["bathrooms"],
+                latitude=_to_float(r["latitude"]), longitude=_to_float(r["longitude"]),
+                sale_date=r["sale_date"], sale_price=_to_float(r["sale_price"]),
+                sqft=r["sqft"], bedrooms=r["bedrooms"],
+                bathrooms=_to_float(r["bathrooms"]),
                 year_built=r["year_built"], property_type=r["property_type"],
                 pool=r["pool"], garage_spaces=r["garage_spaces"], condition=r["condition"],
-                price_per_sqft=r["price_per_sqft"],
+                price_per_sqft=_to_float(r["price_per_sqft"]),
                 source_id=r["source_id"], source_name=r["source_name"],
                 dedup_key=r["dedup_key"],
             )
-            results.append((row, r["distance_meters"] / _METERS_PER_MILE))
+            dist_miles = _to_float(r["distance_meters"]) / _METERS_PER_MILE
+            results.append((row, dist_miles))
         return results
 
     def upsert(self, row: CompRow) -> bool:
@@ -146,6 +178,9 @@ class PostgresCompRepository(CompRepository):
             })
             inserted = cur.rowcount == 1
             self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
         finally:
             cur.close()
         return inserted
@@ -155,9 +190,41 @@ class PostgresCompRepository(CompRepository):
         try:
             cur.execute(_COUNT_SQL)
             row = cur.fetchone()
+        except Exception:
+            self._conn.rollback()
+            raise
         finally:
             cur.close()
         return row["n"] if isinstance(row, dict) else row[0]
+
+    def record_ingestion_run(
+        self,
+        source_name: str,
+        file_name: str,
+        result: IngestResult,
+        started_at: Optional[datetime] = None,
+        completed_at: Optional[datetime] = None,
+    ) -> None:
+        cur = self._conn.cursor()
+        try:
+            cur.execute(_INSERT_INGESTION_RUN_SQL, {
+                "source_name": source_name,
+                "file_name": file_name,
+                "records_read": result.records_read,
+                "records_added": result.records_added,
+                "records_skipped": result.records_skipped,
+                "error_count": len(result.errors),
+                "errors": json.dumps(result.errors),
+                "started_at": started_at,
+                "completed_at": completed_at,
+                "status": result.status,
+            })
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
+        finally:
+            cur.close()
 
 
 class PostgresCompSource(CompSource):

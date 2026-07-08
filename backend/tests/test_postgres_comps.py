@@ -80,28 +80,44 @@ def _row(
 
 class TestDedupKey:
     def test_deterministic(self):
-        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 150_000.0)
-        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 150_000.0)
+        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
         assert k1 == k2
 
     def test_case_and_whitespace_insensitive(self):
-        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 150_000.0)
-        k2 = compute_dedup_key("  123 OAK ST  ", date(2026, 1, 1), 150_000.0)
+        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        k2 = compute_dedup_key("  123 OAK ST  ", date(2026, 1, 1))
+        assert k1 == k2
+
+    def test_street_suffix_variants_produce_same_key(self):
+        k1 = compute_dedup_key("123 Oak Street", date(2026, 1, 1))
+        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        assert k1 == k2
+
+    def test_punctuation_ignored(self):
+        k1 = compute_dedup_key("123 Oak St.", date(2026, 1, 1))
+        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
         assert k1 == k2
 
     def test_different_address_differs(self):
-        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 150_000.0)
-        k2 = compute_dedup_key("456 Elm St", date(2026, 1, 1), 150_000.0)
+        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        k2 = compute_dedup_key("456 Elm St", date(2026, 1, 1))
         assert k1 != k2
 
-    def test_different_price_differs(self):
-        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 150_000.0)
-        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 151_000.0)
-        assert k1 != k2
+    def test_different_price_same_key(self):
+        """
+        Sale price is intentionally excluded from the dedup key: the same
+        closed sale is often reported with slightly different prices across
+        providers or after a correction, and should still be treated as one
+        sale rather than duplicated.
+        """
+        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        assert k1 == k2
 
     def test_different_date_differs(self):
-        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1), 150_000.0)
-        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 2), 150_000.0)
+        k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
+        k2 = compute_dedup_key("123 Oak St", date(2026, 1, 2))
         assert k1 != k2
 
     def test_comp_row_auto_computes_dedup_key(self):
@@ -112,6 +128,12 @@ class TestDedupKey:
     def test_comp_row_explicit_dedup_key_preserved(self):
         row = _row(dedup_key="custom-key")
         assert row.dedup_key == "custom-key"
+
+    def test_comp_row_same_address_date_different_price_dedupes(self):
+        """Codifies the price-exclusion behavior at the CompRow level."""
+        row1 = _row(address="1 Oak St", sale_date=date(2026, 1, 1), sale_price=150_000.0)
+        row2 = _row(address="1 Oak St", sale_date=date(2026, 1, 1), sale_price=149_999.60)
+        assert row1.dedup_key == row2.dedup_key
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -318,6 +340,7 @@ class _FakeConnection:
     def __init__(self, cursor: _FakeCursor):
         self._cursor = cursor
         self.committed = False
+        self.rolled_back = False
 
     def cursor(self):
         return self._cursor
@@ -325,8 +348,43 @@ class _FakeConnection:
     def commit(self):
         self.committed = True
 
+    def rollback(self):
+        self.rolled_back = True
+
+
+class _FailingCursor:
+    """Raises on execute() to simulate a DB error mid-statement."""
+
+    def execute(self, sql, params=None):
+        raise RuntimeError("simulated DB failure")
+
+    def fetchall(self):
+        return []
+
+    def fetchone(self):
+        return None
+
+    def close(self):
+        pass
+
 
 class TestPostgresCompRepositorySQL:
+    def test_query_targets_comp_pool_not_comparable_sales(self):
+        cur = _FakeCursor(fetchall_result=[])
+        conn = _FakeConnection(cur)
+        repo = PostgresCompRepository(conn)
+        repo.query_within_radius(SUBJECT_LAT, SUBJECT_LNG, radius_miles=0.5, cutoff_date=TODAY)
+        assert "FROM comp_pool" in cur.executed_sql
+        assert "comparable_sales" not in cur.executed_sql
+
+    def test_upsert_targets_comp_pool_not_comparable_sales(self):
+        cur = _FakeCursor()
+        conn = _FakeConnection(cur)
+        repo = PostgresCompRepository(conn)
+        repo.upsert(_row())
+        assert "INTO comp_pool" in cur.executed_sql
+        assert "comparable_sales" not in cur.executed_sql
+
     def test_query_uses_st_dwithin(self):
         cur = _FakeCursor(fetchall_result=[])
         conn = _FakeConnection(cur)
@@ -415,6 +473,85 @@ class TestPostgresCompRepositorySQL:
         conn = _FakeConnection(cur)
         repo = PostgresCompRepository(conn)
         assert repo.count() == 7
+
+    def test_query_maps_decimal_like_values_to_float(self):
+        """
+        Simulates a driver returning Decimal for NUMERIC columns — the
+        repository must cast to float so ARV arithmetic never mixes types.
+        """
+        from decimal import Decimal
+
+        db_row = {
+            "address": "1 Oak St", "city": "Memphis", "state": "TN", "zip": "38104",
+            "latitude": Decimal("35.1495"), "longitude": Decimal("-90.0490"),
+            "sale_date": TODAY, "sale_price": Decimal("150000.00"), "sqft": 1500,
+            "bedrooms": 3, "bathrooms": Decimal("2.0"), "year_built": 1980, "property_type": "sfr",
+            "pool": False, "garage_spaces": 1, "condition": "good", "price_per_sqft": Decimal("100.00"),
+            "source_id": "abc", "source_name": "mls", "dedup_key": "deadbeef",
+            "distance_meters": Decimal("804.67"),
+        }
+        cur = _FakeCursor(fetchall_result=[db_row])
+        conn = _FakeConnection(cur)
+        repo = PostgresCompRepository(conn)
+        results = repo.query_within_radius(SUBJECT_LAT, SUBJECT_LNG, radius_miles=1.0, cutoff_date=TODAY)
+        row, dist = results[0]
+        assert isinstance(row.sale_price, float)
+        assert isinstance(row.latitude, float)
+        assert isinstance(row.bathrooms, float)
+        assert isinstance(row.price_per_sqft, float)
+        assert isinstance(dist, float)
+
+
+class TestPostgresCompRepositoryRollback:
+    def test_query_rolls_back_on_failure(self):
+        conn = _FakeConnection(_FailingCursor())
+        repo = PostgresCompRepository(conn)
+        with pytest.raises(RuntimeError):
+            repo.query_within_radius(SUBJECT_LAT, SUBJECT_LNG, radius_miles=0.5, cutoff_date=TODAY)
+        assert conn.rolled_back is True
+
+    def test_upsert_rolls_back_on_failure(self):
+        conn = _FakeConnection(_FailingCursor())
+        repo = PostgresCompRepository(conn)
+        with pytest.raises(RuntimeError):
+            repo.upsert(_row())
+        assert conn.rolled_back is True
+        assert conn.committed is False
+
+    def test_count_rolls_back_on_failure(self):
+        conn = _FakeConnection(_FailingCursor())
+        repo = PostgresCompRepository(conn)
+        with pytest.raises(RuntimeError):
+            repo.count()
+        assert conn.rolled_back is True
+
+    def test_record_ingestion_run_rolls_back_on_failure(self):
+        conn = _FakeConnection(_FailingCursor())
+        repo = PostgresCompRepository(conn)
+        with pytest.raises(RuntimeError):
+            repo.record_ingestion_run("csv", "comps.csv", IngestResult(records_read=1, records_added=1))
+        assert conn.rolled_back is True
+
+
+class TestPostgresCompRepositoryIngestionRunAudit:
+    def test_record_ingestion_run_inserts_into_comp_ingestion_runs(self):
+        cur = _FakeCursor()
+        conn = _FakeConnection(cur)
+        repo = PostgresCompRepository(conn)
+        result = IngestResult(records_read=5, records_added=4, records_skipped=1, errors=["row 3: bad"])
+        repo.record_ingestion_run("csv", "comps.csv", result)
+        assert "comp_ingestion_runs" in cur.executed_sql
+        assert cur.executed_params["records_read"] == 5
+        assert cur.executed_params["records_added"] == 4
+        assert cur.executed_params["error_count"] == 1
+        assert cur.executed_params["status"] == "partial"
+
+    def test_record_ingestion_run_commits(self):
+        cur = _FakeCursor()
+        conn = _FakeConnection(cur)
+        repo = PostgresCompRepository(conn)
+        repo.record_ingestion_run("csv", "comps.csv", IngestResult(records_read=1, records_added=1))
+        assert conn.committed is True
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -557,3 +694,38 @@ class TestCsvCompIngester:
         repo = InMemoryCompRepository()
         result = CsvCompIngester(repo).ingest_file(csv_path)
         assert result.status == "success"
+
+
+class TestCsvCompIngesterAuditWiring:
+    def test_ingest_records_ingestion_run(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 Oak St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500"},
+        ])
+        repo = InMemoryCompRepository()
+        CsvCompIngester(repo, source_name="propstream").ingest_file(csv_path)
+        assert len(repo.ingestion_runs) == 1
+        run = repo.ingestion_runs[0]
+        assert run["source_name"] == "propstream"
+        assert run["file_name"] == str(csv_path)
+        assert run["result"].records_added == 1
+
+    def test_ingest_records_run_even_when_file_missing(self, tmp_path):
+        repo = InMemoryCompRepository()
+        CsvCompIngester(repo).ingest_file(tmp_path / "missing.csv")
+        assert len(repo.ingestion_runs) == 1
+        assert repo.ingestion_runs[0]["result"].status == "failed"
+
+    def test_ingest_run_started_before_completed(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 Oak St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500"},
+        ])
+        repo = InMemoryCompRepository()
+        CsvCompIngester(repo).ingest_file(csv_path)
+        run = repo.ingestion_runs[0]
+        assert run["started_at"] <= run["completed_at"]

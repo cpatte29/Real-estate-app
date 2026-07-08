@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import csv
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -29,6 +30,7 @@ class CsvCompIngester:
     def ingest_file(self, csv_path: str | Path, encoding: str = "utf-8") -> IngestResult:
         path = Path(csv_path)
         result = IngestResult()
+        started_at = datetime.utcnow()
 
         try:
             with path.open(encoding=encoding, newline="") as fh:
@@ -50,6 +52,15 @@ class CsvCompIngester:
         except (OSError, csv.Error) as exc:
             result.errors.append(str(exc))
             logger.error("CsvCompIngester: failed to read %s — %s", path, exc)
+
+        completed_at = datetime.utcnow()
+        self._repo.record_ingestion_run(
+            source_name=self._source_name,
+            file_name=str(path),
+            result=result,
+            started_at=started_at,
+            completed_at=completed_at,
+        )
 
         logger.info(
             "CsvCompIngester: %s | read=%d added=%d skipped=%d errors=%d status=%s",
