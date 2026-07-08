@@ -397,3 +397,48 @@ class TestFilenameControlCharacterStripping:
         )
         assert resp.status_code == 200
         assert "\x00" not in resp.json()["file_name"]
+
+
+class TestUploadPage:
+    """
+    The page itself is not token-gated (a plain GET has no way to attach a
+    custom header) — only the POST /upload it calls via JS is.
+    """
+
+    @pytest.fixture
+    def bare_client(self):
+        from app.main import create_app
+        app = create_app()
+        return TestClient(app)
+
+    def test_page_loads_without_token(self, bare_client):
+        resp = bare_client.get("/api/v1/admin/comps/upload-page")
+        assert resp.status_code == 200
+        assert "text/html" in resp.headers["content-type"]
+
+    def test_page_contains_upload_form(self, bare_client):
+        resp = bare_client.get("/api/v1/admin/comps/upload-page")
+        html = resp.text
+        assert '<form' in html
+        assert 'type="file"' in html
+        assert 'type="password"' in html
+        assert "X-Admin-Token" in html
+
+    def test_page_posts_to_upload_endpoint(self, bare_client):
+        html = bare_client.get("/api/v1/admin/comps/upload-page").text
+        assert "/api/v1/admin/comps/upload" in html
+
+    def test_page_does_not_persist_token_client_side(self, bare_client):
+        html = bare_client.get("/api/v1/admin/comps/upload-page").text
+        assert "localStorage" not in html
+        assert "sessionStorage" not in html
+        assert "document.cookie" not in html
+
+    def test_page_shows_result_fields(self, bare_client):
+        html = bare_client.get("/api/v1/admin/comps/upload-page").text
+        for field in ("records_read", "records_added", "records_skipped", "error_count", "errors"):
+            assert field in html
+
+    def test_page_escapes_error_text(self, bare_client):
+        html = bare_client.get("/api/v1/admin/comps/upload-page").text
+        assert "escapeHtml" in html
