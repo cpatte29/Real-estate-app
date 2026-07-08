@@ -13,7 +13,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Optional
+from typing import ClassVar, Optional
 
 from app.scanner.geo import haversine_miles
 
@@ -96,18 +96,43 @@ class CompRow:
 
 @dataclass
 class IngestResult:
-    """Outcome of a single CSV → repository ingestion run."""
+    """
+    Outcome of a single CSV → repository ingestion run.
+
+    ``errors`` stores at most MAX_STORED_ERRORS messages — a malformed
+    upload with hundreds of thousands of bad rows must not balloon this
+    object (and the JSON response / audit row built from it) without bound.
+    ``error_count`` tracks the true total regardless of how many were kept.
+    Use add_error() rather than appending to ``errors`` directly so the cap
+    is enforced consistently.
+    """
+
+    MAX_STORED_ERRORS: ClassVar[int] = 100
 
     records_read: int = 0
     records_added: int = 0
     records_skipped: int = 0
     errors: list[str] = field(default_factory=list)
+    error_count: int = 0
+
+    def add_error(self, message: str) -> None:
+        self.error_count += 1
+        if len(self.errors) < self.MAX_STORED_ERRORS:
+            self.errors.append(message)
+
+    @property
+    def display_errors(self) -> list[str]:
+        """Stored errors, plus a truncation summary if any were dropped."""
+        if self.error_count > len(self.errors):
+            omitted = self.error_count - len(self.errors)
+            return self.errors + [f"...and {omitted} more error(s)"]
+        return list(self.errors)
 
     @property
     def status(self) -> str:
-        if self.errors and self.records_added == 0:
+        if self.error_count and self.records_added == 0:
             return "failed"
-        if self.errors or self.records_skipped:
+        if self.error_count or self.records_skipped:
             return "partial"
         return "success"
 

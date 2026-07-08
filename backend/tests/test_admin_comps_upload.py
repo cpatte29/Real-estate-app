@@ -14,6 +14,10 @@ from fastapi.testclient import TestClient
 from app.api import state as _state
 from app.api.admin_comps import MAX_UPLOAD_BYTES
 from app.scanner.comps.repository import InMemoryCompRepository
+from app.scanner.config import config as scanner_config
+
+ADMIN_TOKEN = "test-admin-token"
+ADMIN_HEADERS = {"X-Admin-Token": ADMIN_TOKEN}
 
 
 @pytest.fixture(autouse=True)
@@ -23,11 +27,20 @@ def clean_stores():
     _state.clear_stores()
 
 
+@pytest.fixture(autouse=True)
+def admin_token_configured():
+    """Every test in this file runs with a known admin token configured."""
+    original = scanner_config.admin_api_token
+    scanner_config.admin_api_token = ADMIN_TOKEN
+    yield
+    scanner_config.admin_api_token = original
+
+
 @pytest.fixture
 def client():
     from app.main import create_app
     app = create_app()
-    return TestClient(app)
+    return TestClient(app, headers=ADMIN_HEADERS)
 
 
 def _csv_bytes(rows: list[str], header: str = "address,city,state,zip,latitude,longitude,sale_date,sale_price,sqft") -> bytes:
@@ -270,3 +283,117 @@ class TestConfiguredRepositoryUsage:
         )
         assert len(custom_repo.ingestion_runs) == 1
         assert custom_repo.ingestion_runs[0]["source_name"] == "admin_upload"
+
+
+class TestAdminAuth:
+    """
+    Uses a bare (no default headers) TestClient so each test controls the
+    X-Admin-Token header explicitly.
+    """
+
+    @pytest.fixture
+    def bare_client(self):
+        from app.main import create_app
+        app = create_app()
+        return TestClient(app)
+
+    def test_missing_token_returns_401(self, bare_client):
+        body = _csv_bytes([VALID_ROW])
+        resp = bare_client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(body), "text/csv")},
+        )
+        assert resp.status_code == 401
+
+    def test_wrong_token_returns_403(self, bare_client):
+        body = _csv_bytes([VALID_ROW])
+        resp = bare_client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(body), "text/csv")},
+            headers={"X-Admin-Token": "not-the-right-token"},
+        )
+        assert resp.status_code == 403
+
+    def test_correct_token_succeeds(self, bare_client):
+        body = _csv_bytes([VALID_ROW])
+        resp = bare_client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(body), "text/csv")},
+            headers=ADMIN_HEADERS,
+        )
+        assert resp.status_code == 200
+
+    def test_no_token_configured_rejects_everyone(self, bare_client):
+        scanner_config.admin_api_token = ""
+        body = _csv_bytes([VALID_ROW])
+        resp = bare_client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(body), "text/csv")},
+            headers=ADMIN_HEADERS,
+        )
+        assert resp.status_code == 403
+
+    def test_upload_rejected_before_repository_is_touched(self, bare_client):
+        """An unauthenticated request must never reach the ingester."""
+        custom_repo = InMemoryCompRepository()
+        _state.set_comp_repository(custom_repo)
+
+        body = _csv_bytes([VALID_ROW])
+        bare_client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(body), "text/csv")},
+        )
+        assert custom_repo.count() == 0
+
+
+class TestErrorResponseCapAndScrubbing:
+    def test_error_response_caps_stored_errors(self, client):
+        header = "address,city,state,zip,latitude,longitude,sale_date,sale_price,sqft"
+        bad_rows = [f"Bad Row {i},Memphis,TN,38104,,,2026-01-01,150000,1500" for i in range(150)]
+        resp = client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(_csv_bytes(bad_rows, header=header)), "text/csv")},
+        )
+        data = resp.json()
+        assert data["error_count"] == 150
+        assert len(data["errors"]) == 101  # 100 stored + 1 summary line
+        assert "50 more" in data["errors"][-1]
+
+    def test_upsert_failure_does_not_leak_internals(self, client, monkeypatch):
+        repo = _state.get_comp_repository()
+
+        def _raise(*args, **kwargs):
+            raise RuntimeError("password=hunter2 host=db-internal-01.prod")
+
+        monkeypatch.setattr(repo, "upsert", _raise)
+
+        body = _csv_bytes([VALID_ROW])
+        resp = client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps.csv", io.BytesIO(body), "text/csv")},
+        )
+        data = resp.json()
+        assert "hunter2" not in str(data)
+        assert "db-internal-01" not in str(data)
+        assert data["errors"][0] == "row 2: database error"
+
+
+class TestFilenameControlCharacterStripping:
+    def test_embedded_newline_stripped_from_response(self, client):
+        body = _csv_bytes([VALID_ROW])
+        resp = client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("evil\r\nX-Injected: true.csv", io.BytesIO(body), "text/csv")},
+        )
+        assert resp.status_code == 200
+        assert "\n" not in resp.json()["file_name"]
+        assert "\r" not in resp.json()["file_name"]
+
+    def test_embedded_control_char_stripped(self, client):
+        body = _csv_bytes([VALID_ROW])
+        resp = client.post(
+            "/api/v1/admin/comps/upload",
+            files={"file": ("comps\x00.csv", io.BytesIO(body), "text/csv")},
+        )
+        assert resp.status_code == 200
+        assert "\x00" not in resp.json()["file_name"]

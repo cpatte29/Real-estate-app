@@ -579,7 +579,7 @@ class TestPostgresCompRepositoryIngestionRunAudit:
         cur = _FakeCursor()
         conn = _FakeConnection(cur)
         repo = PostgresCompRepository(conn)
-        result = IngestResult(records_read=5, records_added=4, records_skipped=1, errors=["row 3: bad"])
+        result = IngestResult(records_read=5, records_added=4, records_skipped=1, errors=["row 3: bad"], error_count=1)
         repo.record_ingestion_run("csv", "comps.csv", result)
         assert "comp_ingestion_runs" in cur.executed_sql
         assert cur.executed_params["records_read"] == 5
@@ -894,3 +894,82 @@ class TestIngestResilience:
         run = repo.ingestion_runs[0]
         assert run["result"].records_added == 2
         assert run["result"].status == "partial"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# IngestResult error capping
+# ──────────────────────────────────────────────────────────────────────────────
+
+class TestIngestResultErrorCap:
+    def test_errors_under_cap_all_stored(self):
+        result = IngestResult()
+        for i in range(5):
+            result.add_error(f"row {i}: bad")
+        assert len(result.errors) == 5
+        assert result.error_count == 5
+
+    def test_errors_over_cap_truncated_but_count_tracked(self):
+        result = IngestResult()
+        for i in range(150):
+            result.add_error(f"row {i}: bad")
+        assert len(result.errors) == IngestResult.MAX_STORED_ERRORS
+        assert result.error_count == 150
+
+    def test_display_errors_includes_truncation_summary(self):
+        result = IngestResult()
+        for i in range(150):
+            result.add_error(f"row {i}: bad")
+        display = result.display_errors
+        assert len(display) == IngestResult.MAX_STORED_ERRORS + 1
+        assert "50 more" in display[-1]
+
+    def test_display_errors_no_summary_when_under_cap(self):
+        result = IngestResult()
+        result.add_error("row 1: bad")
+        assert result.display_errors == ["row 1: bad"]
+
+    def test_status_uses_error_count_not_stored_list_length(self):
+        result = IngestResult(records_added=0)
+        for i in range(150):
+            result.add_error(f"row {i}: bad")
+        assert result.status == "failed"
+
+    def test_ingest_many_bad_rows_caps_stored_errors(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        header = "address,city,state,zip,latitude,longitude,sale_date,sale_price,sqft\n"
+        bad_rows = "".join(f"Bad Row {i},Memphis,TN,38104,,,2026-01-01,150000,1500\n" for i in range(150))
+        csv_path.write_text(header + bad_rows)
+
+        repo = InMemoryCompRepository()
+        result = CsvCompIngester(repo).ingest_file(csv_path)
+
+        assert result.error_count == 150
+        assert len(result.errors) == IngestResult.MAX_STORED_ERRORS
+        assert len(result.display_errors) == IngestResult.MAX_STORED_ERRORS + 1
+
+
+class TestIngestionErrorScrubbing:
+    def test_upsert_failure_message_is_generic(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 Oak St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500"},
+        ])
+
+        class _RaisingRepo(InMemoryCompRepository):
+            def upsert(self, row):
+                raise RuntimeError("password=hunter2 connection to db-internal-01.prod failed")
+
+        repo = _RaisingRepo()
+        result = CsvCompIngester(repo).ingest_file(csv_path)
+
+        assert result.error_count == 1
+        assert "hunter2" not in result.errors[0]
+        assert "db-internal-01" not in result.errors[0]
+        assert result.errors[0] == "row 2: database error"
+
+    def test_file_read_failure_message_is_generic(self, tmp_path):
+        repo = InMemoryCompRepository()
+        result = CsvCompIngester(repo).ingest_file(tmp_path / "does_not_exist.csv")
+        assert result.errors == ["file read error"]

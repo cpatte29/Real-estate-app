@@ -4,21 +4,24 @@ spreadsheets) into the comp pool.
 
 POST /api/v1/admin/comps/upload — multipart CSV upload, ingested via
 CsvCompIngester against the process-wide CompRepository (app.api.state).
+Requires the X-Admin-Token header (see verify_admin_token).
 """
 from __future__ import annotations
 
 import logging
 import os
+import re
 import tempfile
 from pathlib import Path
+from typing import Optional
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
 
 from app.api import state as store
 from app.scanner.comps.ingestion import CsvCompIngester
+from app.scanner.config import config
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/api/v1/admin/comps", tags=["admin"])
 
 # ── Upload limits ──────────────────────────────────────────────────────────────
 
@@ -27,15 +30,45 @@ _ALLOWED_EXTENSION = ".csv"
 _CHUNK_SIZE = 1024 * 1024  # 1 MB, read incrementally so we never buffer an
                            # oversized file fully in memory before rejecting it
 
+_CONTROL_CHARS_RE = re.compile(r"[\x00-\x1f\x7f]")
+
+
+# ── Auth ─────────────────────────────────────────────────────────────────────
+
+def verify_admin_token(x_admin_token: Optional[str] = Header(None, alias="X-Admin-Token")):
+    """
+    Require a valid X-Admin-Token header on every admin route.
+
+    Fails closed: if no admin_api_token is configured (the default), every
+    request is rejected with 403 rather than silently allowing access.
+    """
+    expected = config.admin_api_token
+    if not expected:
+        raise HTTPException(status_code=403, detail="Admin API is not configured")
+    if x_admin_token is None:
+        raise HTTPException(status_code=401, detail="X-Admin-Token header is required")
+    if x_admin_token != expected:
+        raise HTTPException(status_code=403, detail="Invalid admin API token")
+
+
+router = APIRouter(
+    prefix="/api/v1/admin/comps",
+    tags=["admin"],
+    dependencies=[Depends(verify_admin_token)],
+)
+
 
 def _safe_original_name(filename: str | None) -> str:
     """
-    Returns just the base name for display/audit purposes — never used to
-    construct a filesystem path (the actual temp file uses a random name).
-    Strips any directory components a malicious or malformed filename might
-    carry (e.g. "../../etc/passwd").
+    Returns a base name safe for display, logging, and audit purposes —
+    never used to construct a filesystem path (the actual temp file uses a
+    random name). Strips directory components a malicious or malformed
+    filename might carry (e.g. "../../etc/passwd") and strips control
+    characters (e.g. embedded newlines) that could otherwise forge log
+    lines when this value is written to the log.
     """
-    return Path(filename or "upload.csv").name
+    base = Path(filename or "upload.csv").name
+    return _CONTROL_CHARS_RE.sub("", base)
 
 
 @router.post("/upload")
@@ -86,7 +119,7 @@ async def upload_comps_csv(file: UploadFile = File(...)):
         logger.info(
             "Admin comp upload: %s | read=%d added=%d skipped=%d errors=%d status=%s",
             original_name, result.records_read, result.records_added,
-            result.records_skipped, len(result.errors), result.status,
+            result.records_skipped, result.error_count, result.status,
         )
 
         return {
@@ -95,8 +128,8 @@ async def upload_comps_csv(file: UploadFile = File(...)):
             "records_read": result.records_read,
             "records_added": result.records_added,
             "records_skipped": result.records_skipped,
-            "error_count": len(result.errors),
-            "errors": result.errors,
+            "error_count": result.error_count,
+            "errors": result.display_errors,
             "status": result.status,
         }
     finally:

@@ -67,7 +67,23 @@ class ScannerConfig(BaseSettings):
     report_output_dir: str = "reports"
     report_s3_bucket: str = ""
 
+    # ── Admin API auth ───────────────────────────────────────────────
+    # Required value of the X-Admin-Token header for /api/v1/admin/* routes.
+    # Empty (the default) fails closed — admin routes reject every request
+    # until a token is explicitly configured.
+    admin_api_token: str = ""
+
+    # ── CORS ─────────────────────────────────────────────────────────
+    # Comma-separated list of allowed origins. Defaults to common local dev
+    # frontend ports rather than "*" — set SCANNER_CORS_ALLOWED_ORIGINS to
+    # the real deployment origin(s) in production.
+    cors_allowed_origins: str = "http://localhost:3000,http://localhost:5173"
+
     model_config = {"env_file": ".env", "env_prefix": "SCANNER_"}
+
+    @property
+    def cors_allowed_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_allowed_origins.split(",") if o.strip()]
 
 
 # Module-level singleton

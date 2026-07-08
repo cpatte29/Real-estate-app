@@ -80,17 +80,19 @@ class CsvCompIngester:
                         comp_row = self._parse_row(row)
                         if comp_row is None:
                             result.records_skipped += 1
-                            result.errors.append(f"row {i}: missing required field")
+                            result.add_error(f"row {i}: missing required field")
                             continue
 
                         # A single bad row (e.g. a repository/DB error) must
                         # not abort the rest of the file — count it as an
-                        # error and keep going.
+                        # error and keep going. The client only ever sees a
+                        # generic message; the real exception goes to logs
+                        # only (it may carry DB connection/schema details).
                         try:
                             added = self._repo.upsert(comp_row)
                         except Exception as exc:
                             result.records_skipped += 1
-                            result.errors.append(f"row {i}: upsert failed — {exc}")
+                            result.add_error(f"row {i}: database error")
                             logger.warning(
                                 "CsvCompIngester: row %d upsert failed for %s — %s",
                                 i, path, exc,
@@ -102,7 +104,7 @@ class CsvCompIngester:
                         else:
                             result.records_skipped += 1
             except (OSError, csv.Error) as exc:
-                result.errors.append(str(exc))
+                result.add_error("file read error")
                 logger.error("CsvCompIngester: failed to read %s — %s", path, exc)
         finally:
             # Always record the run — even a file-read failure or a
@@ -119,7 +121,7 @@ class CsvCompIngester:
         logger.info(
             "CsvCompIngester: %s | read=%d added=%d skipped=%d errors=%d status=%s",
             path, result.records_read, result.records_added,
-            result.records_skipped, len(result.errors), result.status,
+            result.records_skipped, result.error_count, result.status,
         )
         return result
 
