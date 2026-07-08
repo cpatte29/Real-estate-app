@@ -19,6 +19,44 @@ from app.scanner.comps.repository import CompRepository, CompRow, IngestResult
 
 logger = logging.getLogger(__name__)
 
+# Maps common free-text property type spellings (as seen in MLS/PropStream/
+# ATTOM exports) to the property_type Postgres enum values
+# (sfr, multi_family, condo, townhouse, land). Unrecognized or blank values
+# fall back to "sfr" rather than raising an enum-violation error at insert.
+_PROPERTY_TYPE_MAP = {
+    "single family": "sfr",
+    "single-family": "sfr",
+    "single family residence": "sfr",
+    "sfr/residential": "sfr",
+    "sfr": "sfr",
+    "residential": "sfr",
+
+    "multi family": "multi_family",
+    "multi-family": "multi_family",
+    "multifamily": "multi_family",
+    "multi_family": "multi_family",
+    "duplex": "multi_family",
+    "triplex": "multi_family",
+    "fourplex": "multi_family",
+
+    "townhome": "townhouse",
+    "town house": "townhouse",
+    "town-house": "townhouse",
+    "townhouse": "townhouse",
+
+    "condo": "condo",
+    "condominium": "condo",
+
+    "land": "land",
+    "lot": "land",
+    "vacant land": "land",
+}
+
+
+def _normalize_property_type(raw: Optional[str]) -> str:
+    key = (raw or "").strip().lower()
+    return _PROPERTY_TYPE_MAP.get(key, "sfr")
+
 
 class CsvCompIngester:
     """Loads a CSV of comparable sales into a CompRepository, skipping duplicates."""
@@ -33,34 +71,50 @@ class CsvCompIngester:
         started_at = datetime.utcnow()
 
         try:
-            with path.open(encoding=encoding, newline="") as fh:
-                reader = csv.DictReader(fh)
-                for i, raw_row in enumerate(reader, start=2):
-                    result.records_read += 1
-                    row = {_normalize_key(k): (v or "").strip() for k, v in raw_row.items()}
-                    comp_row = self._parse_row(row)
-                    if comp_row is None:
-                        result.records_skipped += 1
-                        result.errors.append(f"row {i}: missing required field")
-                        continue
+            try:
+                with path.open(encoding=encoding, newline="") as fh:
+                    reader = csv.DictReader(fh)
+                    for i, raw_row in enumerate(reader, start=2):
+                        result.records_read += 1
+                        row = {_normalize_key(k): (v or "").strip() for k, v in raw_row.items()}
+                        comp_row = self._parse_row(row)
+                        if comp_row is None:
+                            result.records_skipped += 1
+                            result.errors.append(f"row {i}: missing required field")
+                            continue
 
-                    added = self._repo.upsert(comp_row)
-                    if added:
-                        result.records_added += 1
-                    else:
-                        result.records_skipped += 1
-        except (OSError, csv.Error) as exc:
-            result.errors.append(str(exc))
-            logger.error("CsvCompIngester: failed to read %s — %s", path, exc)
+                        # A single bad row (e.g. a repository/DB error) must
+                        # not abort the rest of the file — count it as an
+                        # error and keep going.
+                        try:
+                            added = self._repo.upsert(comp_row)
+                        except Exception as exc:
+                            result.records_skipped += 1
+                            result.errors.append(f"row {i}: upsert failed — {exc}")
+                            logger.warning(
+                                "CsvCompIngester: row %d upsert failed for %s — %s",
+                                i, path, exc,
+                            )
+                            continue
 
-        completed_at = datetime.utcnow()
-        self._repo.record_ingestion_run(
-            source_name=self._source_name,
-            file_name=str(path),
-            result=result,
-            started_at=started_at,
-            completed_at=completed_at,
-        )
+                        if added:
+                            result.records_added += 1
+                        else:
+                            result.records_skipped += 1
+            except (OSError, csv.Error) as exc:
+                result.errors.append(str(exc))
+                logger.error("CsvCompIngester: failed to read %s — %s", path, exc)
+        finally:
+            # Always record the run — even a file-read failure or a
+            # partially-completed ingest should leave an audit trail.
+            completed_at = datetime.utcnow()
+            self._repo.record_ingestion_run(
+                source_name=self._source_name,
+                file_name=str(path),
+                result=result,
+                started_at=started_at,
+                completed_at=completed_at,
+            )
 
         logger.info(
             "CsvCompIngester: %s | read=%d added=%d skipped=%d errors=%d status=%s",
@@ -102,7 +156,7 @@ class CsvCompIngester:
             bedrooms=_i(row.get("bedrooms") or row.get("beds")),
             bathrooms=_f(row.get("bathrooms") or row.get("baths")),
             year_built=_i(row.get("year_built")),
-            property_type=(row.get("property_type") or "sfr").lower(),
+            property_type=_normalize_property_type(row.get("property_type")),
             pool=pool,
             garage_spaces=_i(row.get("garage_spaces") or row.get("garage")),
             condition=(row.get("condition") or "").lower() or None,

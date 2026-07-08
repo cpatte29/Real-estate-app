@@ -34,15 +34,30 @@ def _normalize_address(address: str) -> str:
     return " ".join(words)
 
 
-def compute_dedup_key(address: str, sale_date: date) -> str:
+def compute_dedup_key(
+    address: str,
+    sale_date: date,
+    zip_code: Optional[str] = None,
+    city: Optional[str] = None,
+    state: Optional[str] = None,
+) -> str:
     """
     Stable fingerprint for a comparable sale record — identity is address +
-    sale date, NOT sale price. Providers commonly report the same closed
-    sale with slightly different prices (rounding, later corrections,
+    sale date + location, NOT sale price. Providers commonly report the same
+    closed sale with slightly different prices (rounding, later corrections,
     commission-inclusive vs. exclusive figures); keying on price would let
     the same sale slip in twice under two different price reports.
+
+    A geographic component is required: comp_pool is multi-market, and a
+    common street address ("100 Main St") recurs across many cities. Without
+    zip (or city+state when zip is unavailable), two unrelated sales in
+    different markets on the same date would collide and one would be
+    silently dropped as a "duplicate".
     """
-    normalized = f"{_normalize_address(address)}|{sale_date.isoformat()}"
+    geo = (zip_code or "").strip()
+    if not geo:
+        geo = f"{(city or '').strip().lower()},{(state or '').strip().lower()}"
+    normalized = f"{_normalize_address(address)}|{sale_date.isoformat()}|{geo.lower()}"
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:32]
 
 
@@ -73,7 +88,10 @@ class CompRow:
 
     def __post_init__(self):
         if not self.dedup_key:
-            self.dedup_key = compute_dedup_key(self.address, self.sale_date)
+            self.dedup_key = compute_dedup_key(
+                self.address, self.sale_date,
+                zip_code=self.zip, city=self.city, state=self.state,
+            )
 
 
 @dataclass

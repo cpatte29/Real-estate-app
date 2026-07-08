@@ -21,7 +21,7 @@ from app.scanner.comps.repository import (
     compute_dedup_key,
 )
 from app.scanner.comps.postgres_source import PostgresCompRepository, PostgresCompSource
-from app.scanner.comps.ingestion import CsvCompIngester
+from app.scanner.comps.ingestion import CsvCompIngester, _normalize_property_type
 from app.scanner.models import CandidateProperty
 
 
@@ -57,13 +57,16 @@ def _row(
     sale_price=150_000.0,
     sqft=1500,
     property_type="sfr",
+    city="Memphis",
+    state="TN",
+    zip="38104",
     **kwargs,
 ) -> CompRow:
     return CompRow(
         address=address,
-        city="Memphis",
-        state="TN",
-        zip="38104",
+        city=city,
+        state=state,
+        zip=zip,
         latitude=lat if lat is not None else SUBJECT_LAT + 0.001,
         longitude=lng if lng is not None else SUBJECT_LNG + 0.001,
         sale_date=sale_date or (TODAY - timedelta(days=30)),
@@ -119,6 +122,44 @@ class TestDedupKey:
         k1 = compute_dedup_key("123 Oak St", date(2026, 1, 1))
         k2 = compute_dedup_key("123 Oak St", date(2026, 1, 2))
         assert k1 != k2
+
+    def test_same_address_same_date_different_zip_does_not_collide(self):
+        """
+        comp_pool is multi-market — a common street address recurs across
+        many cities. Without a geographic component in the key, two
+        unrelated sales at "100 Main St" in different zips on the same date
+        would collide and one would be silently dropped.
+        """
+        k1 = compute_dedup_key("100 Main St", date(2026, 1, 1), zip_code="38104")
+        k2 = compute_dedup_key("100 Main St", date(2026, 1, 1), zip_code="37201")
+        assert k1 != k2
+
+    def test_same_address_same_date_different_city_state_does_not_collide(self):
+        k1 = compute_dedup_key("100 Main St", date(2026, 1, 1), city="Memphis", state="TN")
+        k2 = compute_dedup_key("100 Main St", date(2026, 1, 1), city="Nashville", state="TN")
+        assert k1 != k2
+
+    def test_zip_takes_priority_over_city_state(self):
+        """Same zip but different city/state text still collides — zip is authoritative."""
+        k1 = compute_dedup_key("100 Main St", date(2026, 1, 1), zip_code="38104", city="Memphis", state="TN")
+        k2 = compute_dedup_key("100 Main St", date(2026, 1, 1), zip_code="38104", city="Cordova", state="TN")
+        assert k1 == k2
+
+    def test_same_zip_still_collides_across_formatting_variants(self):
+        """Same zip + normalized-equivalent address must still dedup."""
+        k1 = compute_dedup_key("123 Oak Street", date(2026, 1, 1), zip_code="38104")
+        k2 = compute_dedup_key("  123 OAK ST.  ", date(2026, 1, 1), zip_code="38104")
+        assert k1 == k2
+
+    def test_missing_zip_falls_back_to_city_state(self):
+        k1 = compute_dedup_key("100 Main St", date(2026, 1, 1), city="Memphis", state="TN")
+        k2 = compute_dedup_key("100 Main St", date(2026, 1, 1), city="Memphis", state="TN")
+        assert k1 == k2
+
+    def test_comp_row_same_address_date_different_zip_does_not_collide(self):
+        row1 = _row(address="1 Oak St", zip="38104")
+        row2 = _row(address="1 Oak St", zip="37201")
+        assert row1.dedup_key != row2.dedup_key
 
     def test_comp_row_auto_computes_dedup_key(self):
         row = _row()
@@ -729,3 +770,127 @@ class TestCsvCompIngesterAuditWiring:
         CsvCompIngester(repo).ingest_file(csv_path)
         run = repo.ingestion_runs[0]
         assert run["started_at"] <= run["completed_at"]
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# property_type normalization
+# ──────────────────────────────────────────────────────────────────────────────
+
+class TestPropertyTypeNormalization:
+    @pytest.mark.parametrize("raw,expected", [
+        ("single family", "sfr"),
+        ("Single-Family", "sfr"),
+        ("SFR/Residential", "sfr"),
+        ("sfr", "sfr"),
+        ("residential", "sfr"),
+        ("multi family", "multi_family"),
+        ("Multi-Family", "multi_family"),
+        ("duplex", "multi_family"),
+        ("triplex", "multi_family"),
+        ("fourplex", "multi_family"),
+        ("townhome", "townhouse"),
+        ("Town House", "townhouse"),
+        ("townhouse", "townhouse"),
+        ("condo", "condo"),
+        ("Condominium", "condo"),
+        ("land", "land"),
+        ("Lot", "land"),
+    ])
+    def test_known_variants_normalize(self, raw, expected):
+        assert _normalize_property_type(raw) == expected
+
+    def test_unknown_value_falls_back_to_sfr(self):
+        assert _normalize_property_type("some weird provider string") == "sfr"
+
+    def test_blank_falls_back_to_sfr(self):
+        assert _normalize_property_type("") == "sfr"
+
+    def test_none_falls_back_to_sfr(self):
+        assert _normalize_property_type(None) == "sfr"
+
+    def test_ingest_maps_messy_property_type_value(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 Oak St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500", "property_type": "Single Family"},
+        ])
+        repo = InMemoryCompRepository()
+        CsvCompIngester(repo).ingest_file(csv_path)
+        row = next(iter(repo._rows.values()))
+        assert row.property_type == "sfr"
+
+    def test_ingest_maps_duplex_to_multi_family(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 Oak St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500", "property_type": "Duplex"},
+        ])
+        repo = InMemoryCompRepository()
+        CsvCompIngester(repo).ingest_file(csv_path)
+        row = next(iter(repo._rows.values()))
+        assert row.property_type == "multi_family"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Per-row upsert resilience
+# ──────────────────────────────────────────────────────────────────────────────
+
+class _FailOnSecondRowRepository(InMemoryCompRepository):
+    """Raises on the 2nd upsert call to simulate a mid-file DB error."""
+
+    def __init__(self):
+        super().__init__()
+        self._call_count = 0
+
+    def upsert(self, row):
+        self._call_count += 1
+        if self._call_count == 2:
+            raise RuntimeError("simulated DB failure on row 2")
+        return super().upsert(row)
+
+
+class TestIngestResilience:
+    def test_middle_row_failure_does_not_abort_remaining_rows(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 First St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500"},
+            {"address": "2 Second St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.16", "longitude": "-90.06", "sale_date": "2026-01-02",
+             "sale_price": "155000", "sqft": "1550"},
+            {"address": "3 Third St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.17", "longitude": "-90.07", "sale_date": "2026-01-03",
+             "sale_price": "160000", "sqft": "1600"},
+        ])
+        repo = _FailOnSecondRowRepository()
+        result = CsvCompIngester(repo).ingest_file(csv_path)
+
+        assert result.records_read == 3
+        assert result.records_added == 2
+        assert result.records_skipped == 1
+        assert result.status == "partial"
+        assert any("row 3" in e for e in result.errors)
+
+    def test_audit_run_recorded_despite_row_failure(self, tmp_path):
+        csv_path = tmp_path / "comps.csv"
+        _write_csv(csv_path, [
+            {"address": "1 First St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.15", "longitude": "-90.05", "sale_date": "2026-01-01",
+             "sale_price": "150000", "sqft": "1500"},
+            {"address": "2 Second St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.16", "longitude": "-90.06", "sale_date": "2026-01-02",
+             "sale_price": "155000", "sqft": "1550"},
+            {"address": "3 Third St", "city": "Memphis", "state": "TN", "zip": "38104",
+             "latitude": "35.17", "longitude": "-90.07", "sale_date": "2026-01-03",
+             "sale_price": "160000", "sqft": "1600"},
+        ])
+        repo = _FailOnSecondRowRepository()
+        CsvCompIngester(repo).ingest_file(csv_path)
+
+        assert len(repo.ingestion_runs) == 1
+        run = repo.ingestion_runs[0]
+        assert run["result"].records_added == 2
+        assert run["result"].status == "partial"
